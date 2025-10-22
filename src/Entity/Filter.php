@@ -79,9 +79,13 @@ class Filter implements Timestampable, SoftDeleteable
     #[ORM\OrderBy(['lft' => 'ASC'])]
     private Collection $children;
 
+    #[ORM\ManyToMany(targetEntity: Slot::class, inversedBy: 'filters', cascade: ['persist'])]
+    private Collection $slots;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
+        $this->slots = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -175,6 +179,90 @@ class Filter implements Timestampable, SoftDeleteable
                 $child->setParent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(float $price): static
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getDateBegin(): ?\DateTimeImmutable
+    {
+        return $this->dateBegin;
+    }
+
+    public function setDateBegin(\DateTimeImmutable $dateBegin): static
+    {
+        $this->dateBegin = $dateBegin;
+
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTimeImmutable
+    {
+        return $this->dateEnd;
+    }
+
+    public function setDateEnd(\DateTimeImmutable $dateEnd): static
+    {
+        $this->dateEnd = $dateEnd;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Slot>
+     */
+    public function getSlots(): Collection
+    {
+        return $this->slots;
+    }
+
+    public function addSlot(Slot $slot): static
+    {
+        if (!$this->slots->contains($slot)) {
+            $this->slots->add($slot);
+        }
+
+        return $this;
+    }
+
+    public function removeSlot(Slot $slot): static
+    {
+        $this->slots->removeElement($slot);
 
         return $this;
     }

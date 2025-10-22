@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SlotRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\SoftDeleteable\SoftDeleteable;
@@ -36,6 +38,14 @@ class Slot implements Timestampable, SoftDeleteable
     #[ORM\Column(type: 'datetimetz_immutable')]
     #[Assert\NotNull]
     private \DateTimeImmutable $dateEnd;
+
+    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'slots', cascade: ['persist'])]
+    private Collection $filters;
+
+    public function __construct()
+    {
+        $this->filters = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -86,6 +96,33 @@ class Slot implements Timestampable, SoftDeleteable
     public function setDateEnd(\DateTimeImmutable $dateEnd): static
     {
         $this->dateEnd = $dateEnd;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Filter>
+     */
+    public function getFilters(): Collection
+    {
+        return $this->filters;
+    }
+
+    public function addFilter(Filter $filter): static
+    {
+        if (!$this->filters->contains($filter)) {
+            $this->filters->add($filter);
+            $filter->addSlot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilter(Filter $filter): static
+    {
+        if ($this->filters->removeElement($filter)) {
+            $filter->removeSlot($this);
+        }
 
         return $this;
     }
