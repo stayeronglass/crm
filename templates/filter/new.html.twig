@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Filter{% endblock %}
+
+{% block body %}
+    <h1>Create new Filter</h1>
+
+    {{ include('filter/_form.html.twig') }}
+
+    <a href="{{ path('app_filter_index') }}">back to list</a>
+{% endblock %}

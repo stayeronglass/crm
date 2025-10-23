@@ -42,6 +42,11 @@ class Slot implements Timestampable, SoftDeleteable
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'slots', cascade: ['persist'])]
     private Collection $filters;
 
+    #[ORM\Column(type: Types::FLOAT, nullable: false)]
+    #[Assert\NotNull]
+    #[Assert\GreaterThan(0)]
+    private ?float $price;
+
     public function __construct()
     {
         $this->filters = new ArrayCollection();
@@ -123,6 +128,18 @@ class Slot implements Timestampable, SoftDeleteable
         if ($this->filters->removeElement($filter)) {
             $filter->removeSlot($this);
         }
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(float $price): static
+    {
+        $this->price = $price;
 
         return $this;
     }

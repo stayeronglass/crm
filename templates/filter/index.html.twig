@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Filter index{% endblock %}
+
+{% block body %}
+    <h1>Filter index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>DateBegin</th>
+                <th>DateEnd</th>
+                <th>Lft</th>
+                <th>Lvl</th>
+                <th>Rgt</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>DeletedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for filter in filters %}
+            <tr>
+                <td>{{ filter.id }}</td>
+                <td>{{ filter.title }}</td>
+                <td>{{ filter.description }}</td>
+                <td>{{ filter.price }}</td>
+                <td>{{ filter.dateBegin ? filter.dateBegin|date('Y-m-d H:i:s T') : '' }}</td>
+                <td>{{ filter.dateEnd ? filter.dateEnd|date('Y-m-d H:i:s T') : '' }}</td>
+                <td>{{ filter.lft }}</td>
+                <td>{{ filter.lvl }}</td>
+                <td>{{ filter.rgt }}</td>
+                <td>{{ filter.createdAt ? filter.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ filter.updatedAt ? filter.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ filter.deletedAt ? filter.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_filter_show', {'id': filter.id}) }}">show</a>
+                    <a href="{{ path('app_filter_edit', {'id': filter.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_filter_new') }}">Create new</a>
+{% endblock %}

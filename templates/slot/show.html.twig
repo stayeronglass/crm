@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Slot{% endblock %}
+
+{% block body %}
+    <h1>Slot</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ slot.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ slot.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ slot.description }}</td>
+            </tr>
+            <tr>
+                <th>DateBegin</th>
+                <td>{{ slot.dateBegin ? slot.dateBegin|date('Y-m-d H:i:s T') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateEnd</th>
+                <td>{{ slot.dateEnd ? slot.dateEnd|date('Y-m-d H:i:s T') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ slot.createdAt ? slot.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ slot.updatedAt ? slot.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DeletedAt</th>
+                <td>{{ slot.deletedAt ? slot.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_slot_index') }}">back to list</a>
+
+    <a href="{{ path('app_slot_edit', {'id': slot.id}) }}">edit</a>
+
+    {{ include('slot/_delete_form.html.twig') }}
+{% endblock %}

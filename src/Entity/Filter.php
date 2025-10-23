@@ -34,19 +34,16 @@ class Filter implements Timestampable, SoftDeleteable
     #[Assert\NotBlank]
     private ?string $description;
 
-    #[ORM\Column(type: Types::FLOAT, nullable: false)]
-    #[Assert\NotNull]
-    #[Assert\GreaterThan(0)]
-    private float $price;
+
 
 
     #[ORM\Column(type: 'datetimetz_immutable')]
     #[Assert\NotNull]
-    private \DateTimeImmutable $dateBegin;
+    private ?\DateTimeImmutable $dateBegin;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
     #[Assert\NotNull]
-    private \DateTimeImmutable $dateEnd;
+    private ?\DateTimeImmutable $dateEnd;
 
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
@@ -207,18 +204,6 @@ class Filter implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(float $price): static
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     public function getDateBegin(): ?\DateTimeImmutable
     {
         return $this->dateBegin;
@@ -267,4 +252,9 @@ class Filter implements Timestampable, SoftDeleteable
         return $this;
     }
 
+
+    public function __toString(): string
+    {
+        return $this->getTitle() ?? '';
+    }
 }

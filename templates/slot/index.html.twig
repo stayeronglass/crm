@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Slot index{% endblock %}
+
+{% block body %}
+    <h1>Slot index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>DateBegin</th>
+                <th>DateEnd</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>DeletedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for slot in slots %}
+            <tr>
+                <td>{{ slot.id }}</td>
+                <td>{{ slot.title }}</td>
+                <td>{{ slot.description }}</td>
+                <td>{{ slot.dateBegin ? slot.dateBegin|date('Y-m-d H:i:s T') : '' }}</td>
+                <td>{{ slot.dateEnd ? slot.dateEnd|date('Y-m-d H:i:s T') : '' }}</td>
+                <td>{{ slot.createdAt ? slot.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ slot.updatedAt ? slot.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ slot.deletedAt ? slot.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_slot_show', {'id': slot.id}) }}">show</a>
+                    <a href="{{ path('app_slot_edit', {'id': slot.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_slot_new') }}">Create new</a>
+{% endblock %}
