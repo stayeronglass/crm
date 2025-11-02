@@ -140,5 +140,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="dayjs" level="application" />
+    <orderEntry type="library" name="@event-calendar/build" level="application" />
   </component>
 </module>

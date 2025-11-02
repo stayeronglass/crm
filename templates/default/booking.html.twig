@@ -3,7 +3,7 @@
 {% block title %}Hello DefaultController!{% endblock %}
 
 {% block body %}
-{% for i in m %}
-    <a href="{{ path('app_booking', {'id' : i.id}) }}">{{ i.title }}</a>
-{% endfor %}
+    {% for i in m %}
+        <a href="{{ path('app_booking2', {'id' : i.id}) }}">{{ i.title }}</a>
+    {% endfor %}
 {% endblock %}
