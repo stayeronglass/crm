@@ -1,4 +1,3 @@
-
 const resources = [
     { id: 1, title: 'Room 1' }, { id: 2, title: 'Room 2' }, { id: 3, title: 'Room 3'}
 ];
