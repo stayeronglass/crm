@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\FilterRepository;
+use App\Repository\SlotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +12,16 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DefaultController extends AbstractController
 {
     #[Route('/', name: 'app_default')]
-    public function index(FilterRepository $repository): Response
+    public function index(FilterRepository $repository, SlotRepository $slotRepository): Response
     {
         $m = $repository->findBy(['parent' => null]);
 
+        $events = $slotRepository->getEvents();
+
+        $res = $repository->getResources();
         return $this->render('default/index.html.twig', [
+            'events' => $events,
+            'resources' => $res,
             'm' => $m,
         ]);
     }

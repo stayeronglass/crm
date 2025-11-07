@@ -58,9 +58,9 @@
                 durationEditable: false,
                 backgroundColor: 'red',
             }];
-            const resources = [
-                { id: 1, title: 'Room 1' }, { id: 2, title: 'Room 2' }, { id: 3, title: 'Room 3'}
-            ];
+
+            const resources = {{ resources|json_encode()|raw }}
+
             function createDate(hours, minutes) {
                 const now = new Date();
                 now.setHours(hours);
@@ -117,6 +117,24 @@
                     showModal(event);
                 },
             });
+
+
+            async  function getResources() {
+                let result = null;
+                $.ajax({
+                    url: "{{ path('app_ajax_resources') }}",
+                    method: "GET",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        result = data;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
+                console.log(result)
+                return result; // This will now return the data after the synchronous call completes
+            }
 
             function _pad(num) {
                 let norm = Math.floor(Math.abs(num));
