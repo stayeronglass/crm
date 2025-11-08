@@ -105,7 +105,19 @@
                 },
                 resources: resources,
                 scrollTime: '09:00:00',
-                events: events,
+                eventSources: [{
+                    url: '{{ path('app_ajax_events') }}',
+                    method: 'POST',
+                    extraParams: function () {
+                        return {
+                            action: 'bookly_get_staff_appointments',
+                            csrf_token: BooklyL10nGlobal.csrf_token,
+                            staff_ids: obj.options.getStaffMemberIds(),
+                            location_ids: obj.options.getLocationIds(),
+                            service_ids: obj.options.getServiceIds()
+                        };
+                    }
+                }],
                 dayMaxEvents: true,
                 nowIndicator: true,
                 selectable: true,
