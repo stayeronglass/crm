@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
+use App\Form\EventType;
 use App\Repository\FilterRepository;
 use App\Repository\SlotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,11 +17,13 @@ final class DefaultController extends AbstractController
     public function index(FilterRepository $repository, SlotRepository $slotRepository): Response
     {
         $m = $repository->findBy(['parent' => null]);
-
         $events = $slotRepository->getEvents();
+        $form = $this->createForm(EventType::class, new Event());
+
 
         $res = $repository->getResources();
         return $this->render('default/index.html.twig', [
+            'form' => $form,
             'events' => $events,
             'resources' => $res,
             'm' => $m,

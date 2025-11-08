@@ -12,29 +12,8 @@
         <div id="ec"></div>
 
         <dialog id="dialog" >
-            <div class="row" >
-            <form id="form" method="dialog">
-                <h2>Make Reservation</h2>
-                <h3 id="room-name"></h3>
-                <h3 id="date"></h3>
-                <div class="row">
-                    <label for="start">Start:</label>
-                    <input type="time" id="start" name="start-time">
-                </div>
-                <div class="row">
-                    <label for="end">End:</label>
-                    <input type="time" id="end" name="end-time">
-                </div>
-                <div class="row">
-                    <label for="comment">Comment:</label>
-                    <textarea id="comment" name="comment"></textarea>
-                </div>
-                <menu>
-                    <button id="cancel" type="reset">Cancel</button>
-                    <button id="confirm" type="submit">Confirm</button>
-                </menu>
-            </form>
-            </div>
+            <h1>Новая Запись</h1>
+            {{ form(form) }}
         </dialog>
 
 
@@ -74,12 +53,12 @@
                     const resource = resources.find(r => r.id == resourceId);
                     return resource ? resource.title : '';
                 }
-                document.getElementById('room-name').innerText = getResourceTitle(event);
-                const startDate = dayjs(event.start);
-                document.getElementById('date').innerText = startDate.format('YYYY/MM/DD');
-                document.getElementById('start').value = startDate.format('HH:mm');
-                document.getElementById('end').value = dayjs(event.end).format('HH:mm');
-                document.getElementById('comment').value = event.title || '';
+                // document.getElementById('room-name').innerText = getResourceTitle(event);
+                // const startDate = dayjs(event.start);
+                // document.getElementById('date').innerText = startDate.format('YYYY/MM/DD');
+                // document.getElementById('start').value = startDate.format('HH:mm');
+                // document.getElementById('end').value = dayjs(event.end).format('HH:mm');
+                // document.getElementById('comment').value = event.title || '';
                 dialog.event = event;
                 dialog.showModal();
             }
@@ -110,11 +89,7 @@
                     method: 'POST',
                     extraParams: function () {
                         return {
-                            action: 'bookly_get_staff_appointments',
-                            csrf_token: BooklyL10nGlobal.csrf_token,
-                            staff_ids: obj.options.getStaffMemberIds(),
-                            location_ids: obj.options.getLocationIds(),
-                            service_ids: obj.options.getServiceIds()
+
                         };
                     }
                 }],

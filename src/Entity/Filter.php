@@ -79,14 +79,19 @@ class Filter implements Timestampable, SoftDeleteable
     #[ORM\ManyToMany(targetEntity: Slot::class, inversedBy: 'filters', cascade: ['persist'])]
     private Collection $slots;
 
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'filters', cascade: ['persist'])]
-    private Collection $events;
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'service', cascade: ['persist'])]
+    private Collection $eventsService;
+
+
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'place', cascade: ['persist'])]
+    private Collection $eventsPlace;
 
     public function __construct()
     {
         $this->children = new ArrayCollection();
         $this->slots = new ArrayCollection();
-        $this->events = new ArrayCollection();
+        $this->eventsService = new ArrayCollection();
+        $this->eventsPlace = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -259,27 +264,57 @@ class Filter implements Timestampable, SoftDeleteable
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents(): Collection
+    public function getEventsService(): Collection
     {
-        return $this->events;
+        return $this->eventsService;
     }
 
-    public function addEvent(Event $event): static
+    public function addEventsService(Event $eventsService): static
     {
-        if (!$this->events->contains($event)) {
-            $this->events->add($event);
-            $event->setFilters($this);
+        if (!$this->eventsService->contains($eventsService)) {
+            $this->eventsService->add($eventsService);
+            $eventsService->setService($this);
         }
 
         return $this;
     }
 
-    public function removeEvent(Event $event): static
+    public function removeEventsService(Event $eventsService): static
     {
-        if ($this->events->removeElement($event)) {
+        if ($this->eventsService->removeElement($eventsService)) {
             // set the owning side to null (unless already changed)
-            if ($event->getFilters() === $this) {
-                $event->setFilters(null);
+            if ($eventsService->getService() === $this) {
+                $eventsService->setService(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEventsPlace(): Collection
+    {
+        return $this->eventsPlace;
+    }
+
+    public function addEventsPlace(Event $eventsPlace): static
+    {
+        if (!$this->eventsPlace->contains($eventsPlace)) {
+            $this->eventsPlace->add($eventsPlace);
+            $eventsPlace->setPlace($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventsPlace(Event $eventsPlace): static
+    {
+        if ($this->eventsPlace->removeElement($eventsPlace)) {
+            // set the owning side to null (unless already changed)
+            if ($eventsPlace->getPlace() === $this) {
+                $eventsPlace->setPlace(null);
             }
         }
 

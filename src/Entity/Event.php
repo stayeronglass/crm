@@ -38,8 +38,11 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\Type(\DateTimeInterface::class)]
     private \DateTimeImmutable $dateEnd;
 
-    #[ORM\ManyToOne(targetEntity: Filter::class, cascade: ['persist'], inversedBy: 'events')]
-    private Filter $filters;
+    #[ORM\ManyToOne(targetEntity: Filter::class, cascade: ['persist'], inversedBy: 'eventsService')]
+    private Filter $service;
+
+    #[ORM\ManyToOne(targetEntity: Filter::class, cascade: ['persist'], inversedBy: 'eventsPlace')]
+    private Filter $place;
 
     public function getId(): ?int
     {
@@ -82,14 +85,26 @@ class Event implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    public function getFilters(): ?Filter
+    public function getService(): ?Filter
     {
-        return $this->filters;
+        return $this->service;
     }
 
-    public function setFilters(?Filter $filters): static
+    public function setService(?Filter $service): static
     {
-        $this->filters = $filters;
+        $this->service = $service;
+
+        return $this;
+    }
+
+    public function getPlace(): ?Filter
+    {
+        return $this->place;
+    }
+
+    public function setPlace(?Filter $place): static
+    {
+        $this->place = $place;
 
         return $this;
     }
