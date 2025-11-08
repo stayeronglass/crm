@@ -79,15 +79,67 @@ class Filter implements Timestampable, SoftDeleteable
     #[ORM\ManyToMany(targetEntity: Slot::class, inversedBy: 'filters', cascade: ['persist'])]
     private Collection $slots;
 
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'filters', cascade: ['persist'])]
+    private Collection $events;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
         $this->slots = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getDateBegin(): ?\DateTimeImmutable
+    {
+        return $this->dateBegin;
+    }
+
+    public function setDateBegin(\DateTimeImmutable $dateBegin): static
+    {
+        $this->dateBegin = $dateBegin;
+
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTimeImmutable
+    {
+        return $this->dateEnd;
+    }
+
+    public function setDateEnd(\DateTimeImmutable $dateEnd): static
+    {
+        $this->dateEnd = $dateEnd;
+
+        return $this;
     }
 
     public function getLft(): ?int
@@ -180,54 +232,6 @@ class Filter implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getDateBegin(): ?\DateTimeImmutable
-    {
-        return $this->dateBegin;
-    }
-
-    public function setDateBegin(\DateTimeImmutable $dateBegin): static
-    {
-        $this->dateBegin = $dateBegin;
-
-        return $this;
-    }
-
-    public function getDateEnd(): ?\DateTimeImmutable
-    {
-        return $this->dateEnd;
-    }
-
-    public function setDateEnd(\DateTimeImmutable $dateEnd): static
-    {
-        $this->dateEnd = $dateEnd;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Slot>
      */
@@ -252,9 +256,35 @@ class Filter implements Timestampable, SoftDeleteable
         return $this;
     }
 
-
-    public function __toString(): string
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
     {
-        return $this->getTitle() ?? '';
+        return $this->events;
     }
+
+    public function addEvent(Event $event): static
+    {
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
+            $event->setFilters($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): static
+    {
+        if ($this->events->removeElement($event)) {
+            // set the owning side to null (unless already changed)
+            if ($event->getFilters() === $this) {
+                $event->setFilters(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

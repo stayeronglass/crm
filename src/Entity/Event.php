@@ -38,13 +38,8 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\Type(\DateTimeInterface::class)]
     private \DateTimeImmutable $dateEnd;
 
-    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'slots', cascade: ['persist'])]
-    private Collection $filters;
-
-    public function __construct()
-    {
-        $this->filters = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(targetEntity: Filter::class, cascade: ['persist'], inversedBy: 'events')]
+    private Filter $filters;
 
     public function getId(): ?int
     {
@@ -87,29 +82,14 @@ class Event implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    /**
-     * @return Collection<int, Filter>
-     */
-    public function getFilters(): Collection
+    public function getFilters(): ?Filter
     {
         return $this->filters;
     }
 
-    public function addFilter(Filter $filter): static
+    public function setFilters(?Filter $filters): static
     {
-        if (!$this->filters->contains($filter)) {
-            $this->filters->add($filter);
-            $filter->addSlot($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFilter(Filter $filter): static
-    {
-        if ($this->filters->removeElement($filter)) {
-            $filter->removeSlot($this);
-        }
+        $this->filters = $filters;
 
         return $this;
     }
