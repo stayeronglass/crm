@@ -3,6 +3,12 @@
 {% block title %}Hello DefaultController!{% endblock %}
 
 {% block body %}
+    <div id="ajaxMessage" class="alert alert-info alert-dismissible fade show" role="alert" >
+        <span id="messageContent">WGEwegwEG</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     <br />
     <br />
 {% for i in m %}
@@ -13,7 +19,7 @@
 
         <dialog id="dialog" >
             <h1>Новая Запись</h1>
-            {{ form(form) }}
+            {{ form(form, {'attr': {'id': 'form_event'}}) }}
         </dialog>
 
 
@@ -127,6 +133,47 @@
                 let norm = Math.floor(Math.abs(num));
                 return (norm < 10 ? '0' : '') + norm;
             }
+
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('[name="event"]');
+
+                if (form) {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Prevent default form submission
+
+                        const formData = new FormData(form); // Or serialize to JSON
+
+                        fetch(form.action, {
+                            method: form.method,
+                            body: formData, // Or JSON.stringify(Object.fromEntries(formData))
+                            headers: {
+                                'Accept': 'application/json' // Expecting JSON response
+                            }
+                        })
+                            .then(response => response.json()) // Parse JSON response
+                            .then(data => {
+                                console.log(data);
+                                if (data.success) {
+                                    data.flashMessages.forEach(function(flash) {
+                                        console.log(flash);
+                                        // Create and append a div for the flash message
+                                        $('#ajaxMessage').removeClass('alert-danger').addClass('alert-success');
+                                        $('#messageContent').text(flash); // Assuming 'message' in response
+                                        $('#ajaxMessage').fadeIn(); // Show the alert
+                                    });
+                                } else {
+                                    // Handle errors, e.g., display validation errors
+                                    console.error('Form submission failed:', data);
+                                }
+                                dialog.close();
+                            })
+                            .catch(error => {
+                                console.error('Network error or server issue:', error);
+                            });
+                    });
+                }
+            });
         </script>
 
 

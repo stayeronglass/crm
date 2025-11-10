@@ -7,20 +7,36 @@ use App\Form\EventType;
 use App\Repository\FilterRepository;
 use App\Repository\SlotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class DefaultController extends AbstractController
 {
+    public function header(Request $request): Response
+    {
+        return $this->render('default/header.html.twig', [
+        ]);
+    }
+
+    public function footer(Request $request): Response
+    {
+        return $this->render('default/footer.html.twig', [
+        ]);
+    }
+
     #[Route('/', name: 'app_default')]
     public function index(FilterRepository $repository, SlotRepository $slotRepository): Response
     {
         $m = $repository->findBy(['parent' => null]);
         $events = $slotRepository->getEvents();
-        $form = $this->createForm(EventType::class, new Event());
+        $form = $this->createForm(EventType::class, new Event(),[
+            'action' => $this->generateUrl('app_ajax_events_add'),
+            'method' => 'POST',
+            ]);
 
-
+        $this->addFlash('error','test');
         $res = $repository->getResources();
         return $this->render('default/index.html.twig', [
             'form' => $form,

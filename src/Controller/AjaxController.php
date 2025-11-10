@@ -43,13 +43,17 @@ final class AjaxController extends AbstractController
             $em->persist($event);
             $em->flush();
 
-            return new JsonResponse([]);
+            return new JsonResponse([
+                'success' => true,
+                'flashMessages' => ['Создано!']
+            ]);
         }
 
         $errors = $this->getErrorsFromForm($form); // Call the helper method
 
         return new JsonResponse(
             [
+                'success' => false,
                 'type' => 'validation_error',
                 'title' => 'There were validation errors.',
                 'errors' => $errors,

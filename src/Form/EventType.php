@@ -16,15 +16,12 @@ class EventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('comment', null, [
-                'label' => 'Комментарий',
-            ])
             ->add('dateBegin', null, [
-                'label' => 'Дата/Время начала',
+                'label' => 'Дата/Время Начала',
                 'widget' => 'single_text'
             ])
             ->add('dateEnd', null, [
-                'label' => 'Дата/Время окончания',
+                'label' => 'Дата/Время Окончания',
                 'widget' => 'single_text'
             ])
             ->add('service', EntityType::class, [
@@ -36,6 +33,10 @@ class EventType extends AbstractType
                 'label' => 'Место',
                 'class' => Filter::class,
                 'choice_label' => 'title',
+            ])
+            ->add('comment', null, [
+                'label' => 'Комментарий',
+                'empty_data' => '',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Создать',

@@ -9,7 +9,7 @@
         <link href="/assets/bootstrap/css/bootstrap.css" rel="stylesheet">
         <link href="/assets/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
-        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
 
         {% block stylesheets %}
         {% endblock %}
@@ -19,8 +19,17 @@
         {% endblock %}
     </head>
     <body>
+        {% include '_shards/_flash.htm.twig' %}
+
+        <!-- Header -->
+        {{ render(controller('App\\Controller\\DefaultController::header')) }}
+        <!-- /Header -->
+
         {% block body %}{% endblock %}
 
+        <!-- Footer-->
+        {{ render(controller('App\\Controller\\DefaultController::footer')) }}
+        <!-- Footer-->
 
         <script src="/assets/bootstrap/js/bootstrap.js"></script>
     </body>

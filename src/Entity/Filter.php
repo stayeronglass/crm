@@ -86,6 +86,11 @@ class Filter implements Timestampable, SoftDeleteable
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'place', cascade: ['persist'])]
     private Collection $eventsPlace;
 
+
+    #[ORM\ManyToOne(targetEntity: ResourceType::class, cascade: ['persist'], inversedBy: 'filters')]
+    private ResourceType $resourceType;
+
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
@@ -317,6 +322,18 @@ class Filter implements Timestampable, SoftDeleteable
                 $eventsPlace->setPlace(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResourceType(): ?ResourceType
+    {
+        return $this->resourceType;
+    }
+
+    public function setResourceType(?ResourceType $resourceType): static
+    {
+        $this->resourceType = $resourceType;
 
         return $this;
     }
