@@ -36,7 +36,6 @@ final class DefaultController extends AbstractController
             'method' => 'POST',
             ]);
 
-        $this->addFlash('error','test');
         $res = $repository->getResources();
         return $this->render('default/index.html.twig', [
             'form' => $form,

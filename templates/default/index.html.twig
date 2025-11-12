@@ -3,11 +3,9 @@
 {% block title %}Hello DefaultController!{% endblock %}
 
 {% block body %}
-    <div id="ajaxMessage" class="alert alert-info alert-dismissible fade show" role="alert" >
-        <span id="messageContent">WGEwegwEG</span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="alert  alert-dismissible fade" role="alert" id="ajaxMessage" style="display: none;">
+        <span id="messageContent">111</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <br />
     <br />
@@ -153,10 +151,8 @@
                         })
                             .then(response => response.json()) // Parse JSON response
                             .then(data => {
-                                console.log(data);
                                 if (data.success) {
                                     data.flashMessages.forEach(function(flash) {
-                                        console.log(flash);
                                         // Create and append a div for the flash message
                                         $('#ajaxMessage').removeClass('alert-danger').addClass('alert-success');
                                         $('#messageContent').text(flash); // Assuming 'message' in response

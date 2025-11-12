@@ -19,7 +19,7 @@ class FilterRepository extends NestedTreeRepository
     }
 
 
-   public function getResources(int $id = null): array
+   public function getResources(?int $id = null): array
     {
         $q = $this->createQueryBuilder('f')
             ->select('f.id', 'f.title')

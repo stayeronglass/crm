@@ -15,7 +15,7 @@ class SlotRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Slot::class);
     }
-    public function getEvents(int $id = null): array
+    public function getEvents(?int $id = null): array
     {
         $q = $this->createQueryBuilder('s')
             ->orderBy('s.id', 'ASC');
