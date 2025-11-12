@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ResourceTypeRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\SoftDeleteable\SoftDeleteable;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
@@ -25,6 +26,9 @@ class ResourceType  implements Timestampable, SoftDeleteable
     #[Assert\Length(min: 3,max: 255,)]
     private string $title;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank]
+    private ?string $description;
 
     #[ORM\OneToMany(targetEntity: Filter::class, mappedBy: 'resourceType', cascade: ['persist'])]
     private  Collection $filters;
@@ -47,6 +51,18 @@ class ResourceType  implements Timestampable, SoftDeleteable
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }
@@ -79,6 +95,10 @@ class ResourceType  implements Timestampable, SoftDeleteable
         }
 
         return $this;
+    }
+
+    public function __toString(){
+        return $this->title; //or anything else
     }
 
 }

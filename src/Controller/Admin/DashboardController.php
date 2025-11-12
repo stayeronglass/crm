@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ResourceType;
 use App\Entity\Slot;
 use App\Entity\Filter;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -33,6 +34,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Мастерские', 'fa fa-tags', Filter::class);
         yield MenuItem::linkToCrud('Услуги', 'fa fa-tags', Filter::class);
         yield MenuItem::linkToCrud('Слоты', 'fa fa-tags', Slot::class);
+        yield MenuItem::linkToCrud('Типы', 'fa fa-tags', ResourceType::class);
 
         //yield MenuItem::linkToLogout('Logout', 'fa fa-exit');
     }

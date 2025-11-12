@@ -339,4 +339,8 @@ class Filter implements Timestampable, SoftDeleteable
     }
 
 
+    public function __toString(){
+        return $this->title; //or anything else
+    }
+
 }
