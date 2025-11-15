@@ -27,35 +27,29 @@ final class AjaxController extends AbstractController
     #[Route('/ajax/events', name: 'app_ajax_events')]
     public function events(Request $request, EventRepository $repository): Response
     {
-        $events = $repository->getEvents();
+        $events = $repository->getEvents($request->get('start'),$request->get('end'));
 
 
-        $e = [[
-                 'id'=> 1,
-                'resourceIds'=> [1],
-                'start'=> now('-1 hours'),
-                'end'=> now(),
-                'title'=> 'Editable Event',
-                'editable'=> true,
-           ],[
-            'id'=> 2,
-                'resourceIds'=> [2],
-            'start'=> now('+1 hours'),
-                'end'=> now('+2 hours'),
-                'title'=> 'Uneditable Event',
-                 'editable'=> false, // not work
-                'startEditable'=> false,
-                'durationEditable'=> false,
-                'backgroundColor'=> 'red',
+        $result = [];
+        /** @var Event $event */
+        foreach ($events as $event) {
+            $result[] = [
+                'id' => $event->getId(),
+                'title' => $event->getService()->getTitle() . ': ' . $event->getComment(),
+                'start' => $event->getDateBegin()->format('Y-m-d H:i:s'),
+                'end' => $event->getDateEnd()->format('Y-m-d H:i:s'),
+                'resourceIds' => [$event->getResource()->getId()]
+            ];
+        }
 
-        ]];
-        return new JsonResponse(
-            '[
-            {"start":"2025-11-13 1:00:00","end":"2025-11-13 2:00:00","resourceIds":[1],  "title": "Editable Event"},
-            {"start":"2025-11-13 2:00:00","end":"2025-11-13 3:00:00","resourceIds":[2],  "title": "Editable Event"}
-            ]',
-            200, [], true
-        );
+        return new JsonResponse($result);
+//        return new JsonResponse(
+//            '[
+//            {"start":"2025-11-13 1:00:00","end":"2025-11-13 2:00:00","resourceIds":[1],  "title": "Editable Event"},
+//            {"start":"2025-11-13 2:00:00","end":"2025-11-13 3:00:00","resourceIds":[2],  "title": "Editable Event"}
+//            ]',
+//            200, [], true
+//        );
     }
 
     #[Route('/ajax/events/add', name: 'app_ajax_events_add')]

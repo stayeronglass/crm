@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,18 +19,31 @@ class EventRepository extends ServiceEntityRepository
     }
 
 
-    public function getEvents(): array
+    public function getEvents($dateStart, $dateEnd): array
     {
-        return $this->createQueryBuilder('event')
+
+
+        $q = $this->createQueryBuilder('event')
             ->select(
-                'e.id as id',
-                'e.dateBegin as start',
-                'e.dateEnd as end',
-                'e.comment as title',
+                'event'
             )
             ->from('App\Entity\Event', 'e')
-            ->addOrderBy('event.id', 'ASC')
-            ->getQuery()
-            ->getArrayResult();
+            ->addOrderBy('event.id', 'ASC');
+
+        if ($dateStart !== null) {
+            $dateStart = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateStart);
+            $q->andWhere('e.dateBegin >= :start')
+                ->setParameter('start', $dateStart);
+        }
+
+        if ($dateEnd !== null) {
+            $dateEnd = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateEnd);
+            $q->andWhere('e.dateEnd <= :end')
+                ->setParameter('end', $dateEnd);
+
+        }
+
+        return $q->getQuery()
+            ->getResult();
     }
 }

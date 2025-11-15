@@ -44,7 +44,7 @@ class EventType extends AbstractType
             ])
             ->add('cancel', ButtonType::class, [
                 'label' => 'Закрыть',
-                'attr' => ['class' => 'btn btn-secondary', 'onclick' => 'dialog.close();']
+                'attr' => ['class' => 'btn btn-secondary', 'onclick' => 'dialog.close();ec.refetchEvents();']
             ])
         ;
     }
