@@ -2,15 +2,15 @@
 
 namespace App\Repository;
 
-use App\Entity\Filter;
+use App\Entity\Resource;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
-class FilterRepository extends NestedTreeRepository
+class ResourceRepository extends NestedTreeRepository
 {
     public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($em, $em->getClassMetadata(Filter::class));
+        parent::__construct($em, $em->getClassMetadata(Resource::class));
     }
 
     public function findRootNodes(): array

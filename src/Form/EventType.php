@@ -3,7 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Event;
-use App\Entity\Filter;
+use App\Entity\Resource;
+use App\Entity\Service;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -26,12 +27,12 @@ class EventType extends AbstractType
             ])
             ->add('service', EntityType::class, [
                 'label' => 'Услуга',
-                'class' => Filter::class,
+                'class' => Service::class,
                 'choice_label' => 'title',
             ])
-            ->add('place', EntityType::class, [
+            ->add('resource', EntityType::class, [
                 'label' => 'Место',
-                'class' => Filter::class,
+                'class' => Resource::class,
                 'choice_label' => 'title',
             ])
             ->add('comment', null, [

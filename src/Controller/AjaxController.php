@@ -4,7 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
-use App\Repository\FilterRepository;
+use App\Repository\EventRepository;
+use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,21 +14,48 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use function Symfony\Component\Clock\now;
 
 final class AjaxController extends AbstractController
 {
     #[Route('/ajax/resources', name: 'app_ajax_resources')]
-    public function resources(Request $request, FilterRepository $repository): Response
+    public function resources(Request $request, ResourceRepository $repository): Response
     {
         return new JsonResponse($repository->getResources($request->get('id')));
     }
 
     #[Route('/ajax/events', name: 'app_ajax_events')]
-    public function events(Request $request, SlotRepository $repository): Response
+    public function events(Request $request, EventRepository $repository): Response
     {
-        $events = $repository->getEvents($request->get('id'));
+        $events = $repository->getEvents();
 
-        return new JsonResponse($events);
+
+        $e = [[
+                 'id'=> 1,
+                'resourceIds'=> [1],
+                'start'=> now('-1 hours'),
+                'end'=> now(),
+                'title'=> 'Editable Event',
+                'editable'=> true,
+           ],[
+            'id'=> 2,
+                'resourceIds'=> [2],
+            'start'=> now('+1 hours'),
+                'end'=> now('+2 hours'),
+                'title'=> 'Uneditable Event',
+                 'editable'=> false, // not work
+                'startEditable'=> false,
+                'durationEditable'=> false,
+                'backgroundColor'=> 'red',
+
+        ]];
+        return new JsonResponse(
+            '[
+            {"start":"2025-11-13 1:00:00","end":"2025-11-13 2:00:00","resourceIds":[1],  "title": "Editable Event"},
+            {"start":"2025-11-13 2:00:00","end":"2025-11-13 3:00:00","resourceIds":[2],  "title": "Editable Event"}
+            ]',
+            200, [], true
+        );
     }
 
     #[Route('/ajax/events/add', name: 'app_ajax_events_add')]

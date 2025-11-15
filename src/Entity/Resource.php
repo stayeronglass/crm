@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\FilterRepository;
+use App\Repository\ResourceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,10 +14,10 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: FilterRepository::class)]
+#[ORM\Entity(repositoryClass: ResourceRepository::class)]
 #[Gedmo\Tree(type: 'nested')]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
-class Filter implements Timestampable, SoftDeleteable
+class Resource implements Timestampable, SoftDeleteable
 {
     use TimestampableEntity, SoftDeleteableEntity;
     #[ORM\Id]
@@ -35,16 +35,6 @@ class Filter implements Timestampable, SoftDeleteable
     private ?string $description;
 
 
-
-
-    #[ORM\Column(type: 'datetimetz_immutable')]
-    #[Assert\NotNull]
-    private ?\DateTimeImmutable $dateBegin;
-
-    #[ORM\Column(type: 'datetimetz_immutable')]
-    #[Assert\NotNull]
-    private ?\DateTimeImmutable $dateEnd;
-
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
     private ?int $lft;
@@ -61,42 +51,28 @@ class Filter implements Timestampable, SoftDeleteable
 
 
     #[Gedmo\TreeRoot]
-    #[ORM\ManyToOne(targetEntity: Filter::class)]
+    #[ORM\ManyToOne(targetEntity: Resource::class)]
     #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private ?Filter $root;
+    private ?Resource $root;
 
 
     #[Gedmo\TreeParent]
-    #[ORM\ManyToOne(targetEntity: Filter::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: Resource::class, inversedBy: 'children')]
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private ?Filter $parent;
+    private ?Resource $parent;
 
 
-    #[ORM\OneToMany(targetEntity: Filter::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: Resource::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['lft' => 'ASC'])]
     private Collection $children;
 
-    #[ORM\ManyToMany(targetEntity: Slot::class, inversedBy: 'filters', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Slot::class, mappedBy: 'resource', cascade: ['persist'])]
     private Collection $slots;
-
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'service', cascade: ['persist'])]
-    private Collection $eventsService;
-
-
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'place', cascade: ['persist'])]
-    private Collection $eventsPlace;
-
-
-    #[ORM\ManyToOne(targetEntity: ResourceType::class, cascade: ['persist'], inversedBy: 'filters')]
-    private ResourceType $resourceType;
-
 
     public function __construct()
     {
         $this->children = new ArrayCollection();
         $this->slots = new ArrayCollection();
-        $this->eventsService = new ArrayCollection();
-        $this->eventsPlace = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -124,30 +100,6 @@ class Filter implements Timestampable, SoftDeleteable
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getDateBegin(): ?\DateTimeImmutable
-    {
-        return $this->dateBegin;
-    }
-
-    public function setDateBegin(\DateTimeImmutable $dateBegin): static
-    {
-        $this->dateBegin = $dateBegin;
-
-        return $this;
-    }
-
-    public function getDateEnd(): ?\DateTimeImmutable
-    {
-        return $this->dateEnd;
-    }
-
-    public function setDateEnd(\DateTimeImmutable $dateEnd): static
-    {
-        $this->dateEnd = $dateEnd;
 
         return $this;
     }
@@ -213,14 +165,14 @@ class Filter implements Timestampable, SoftDeleteable
     }
 
     /**
-     * @return Collection<int, Filter>
+     * @return Collection<int, Resource>
      */
     public function getChildren(): Collection
     {
         return $this->children;
     }
 
-    public function addChild(Filter $child): static
+    public function addChild(Resource $child): static
     {
         if (!$this->children->contains($child)) {
             $this->children->add($child);
@@ -230,7 +182,7 @@ class Filter implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    public function removeChild(Filter $child): static
+    public function removeChild(Resource $child): static
     {
         if ($this->children->removeElement($child)) {
             // set the owning side to null (unless already changed)
@@ -254,6 +206,7 @@ class Filter implements Timestampable, SoftDeleteable
     {
         if (!$this->slots->contains($slot)) {
             $this->slots->add($slot);
+            $slot->setResource($this);
         }
 
         return $this;
@@ -261,86 +214,19 @@ class Filter implements Timestampable, SoftDeleteable
 
     public function removeSlot(Slot $slot): static
     {
-        $this->slots->removeElement($slot);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Event>
-     */
-    public function getEventsService(): Collection
-    {
-        return $this->eventsService;
-    }
-
-    public function addEventsService(Event $eventsService): static
-    {
-        if (!$this->eventsService->contains($eventsService)) {
-            $this->eventsService->add($eventsService);
-            $eventsService->setService($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEventsService(Event $eventsService): static
-    {
-        if ($this->eventsService->removeElement($eventsService)) {
+        if ($this->slots->removeElement($slot)) {
             // set the owning side to null (unless already changed)
-            if ($eventsService->getService() === $this) {
-                $eventsService->setService(null);
+            if ($slot->getResource() === $this) {
+                $slot->setResource(null);
             }
         }
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Event>
-     */
-    public function getEventsPlace(): Collection
+
+    public function __toString():string
     {
-        return $this->eventsPlace;
+        return $this->title;
     }
-
-    public function addEventsPlace(Event $eventsPlace): static
-    {
-        if (!$this->eventsPlace->contains($eventsPlace)) {
-            $this->eventsPlace->add($eventsPlace);
-            $eventsPlace->setPlace($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEventsPlace(Event $eventsPlace): static
-    {
-        if ($this->eventsPlace->removeElement($eventsPlace)) {
-            // set the owning side to null (unless already changed)
-            if ($eventsPlace->getPlace() === $this) {
-                $eventsPlace->setPlace(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getResourceType(): ?ResourceType
-    {
-        return $this->resourceType;
-    }
-
-    public function setResourceType(?ResourceType $resourceType): static
-    {
-        $this->resourceType = $resourceType;
-
-        return $this;
-    }
-
-
-    public function __toString(){
-        return $this->title; //or anything else
-    }
-
 }

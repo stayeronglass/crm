@@ -39,18 +39,17 @@ class Slot implements Timestampable, SoftDeleteable
     #[Assert\NotNull]
     private \DateTimeImmutable $dateEnd;
 
-    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'slots', cascade: ['persist'])]
-    private Collection $filters;
+    #[ORM\ManyToOne(targetEntity: Resource::class, inversedBy: 'slots')]
+    private ?Resource $resource;
+
+    #[ORM\ManyToOne(targetEntity: Service::class)]
+    private ?Service $service;
+
 
     #[ORM\Column(type: Types::FLOAT, nullable: false)]
     #[Assert\NotNull]
     #[Assert\GreaterThan(0)]
     private ?float $price;
-
-    public function __construct()
-    {
-        $this->filters = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -105,33 +104,6 @@ class Slot implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    /**
-     * @return Collection<int, Filter>
-     */
-    public function getFilters(): Collection
-    {
-        return $this->filters;
-    }
-
-    public function addFilter(Filter $filter): static
-    {
-        if (!$this->filters->contains($filter)) {
-            $this->filters->add($filter);
-            $filter->addSlot($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFilter(Filter $filter): static
-    {
-        if ($this->filters->removeElement($filter)) {
-            $filter->removeSlot($this);
-        }
-
-        return $this;
-    }
-
     public function getPrice(): ?float
     {
         return $this->price;
@@ -143,4 +115,35 @@ class Slot implements Timestampable, SoftDeleteable
 
         return $this;
     }
+
+    public function getResource(): ?Resource
+    {
+        return $this->resource;
+    }
+
+    public function setResource(?Resource $resource): static
+    {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    public function getService(): ?Service
+    {
+        return $this->service;
+    }
+
+    public function setService(?Service $service): static
+    {
+        $this->service = $service;
+
+        return $this;
+    }
+
+
+    public function __toString():string
+    {
+        return $this->title;
+    }
+
 }

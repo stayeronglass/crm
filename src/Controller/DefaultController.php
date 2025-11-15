@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
-use App\Repository\FilterRepository;
+use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +27,7 @@ final class DefaultController extends AbstractController
     }
 
     #[Route('/', name: 'app_default')]
-    public function index(FilterRepository $repository, SlotRepository $slotRepository): Response
+    public function index(ResourceRepository $repository, SlotRepository $slotRepository): Response
     {
         $m = $repository->findBy(['parent' => null]);
         $events = $slotRepository->getEvents();
@@ -46,7 +46,7 @@ final class DefaultController extends AbstractController
     }
 
     #[Route('/booking/{id}', name: 'app_booking')]
-    public function books(Request $request,FilterRepository $repository): Response
+    public function books(Request $request, ResourceRepository $repository): Response
     {
         if(!$request->get('id')) throw $this->createNotFoundException();
 
@@ -58,7 +58,7 @@ final class DefaultController extends AbstractController
     }
 
     #[Route('/booking2/{id}', name: 'app_booking2')]
-    public function books2(Request $request,FilterRepository $repository): Response
+    public function books2(Request $request, ResourceRepository $repository): Response
     {
         if(!$request->get('id')) throw $this->createNotFoundException();
 

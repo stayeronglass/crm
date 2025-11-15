@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Filter;
+use App\Entity\Resource;
 use App\Entity\Slot;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

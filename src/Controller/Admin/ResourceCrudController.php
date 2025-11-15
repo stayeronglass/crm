@@ -2,21 +2,20 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Slot;
+use App\Entity\Resource;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class SlotCrudController extends AbstractCrudController
+class ResourceCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Slot::class;
+        return Resource::class;
     }
 
     public function configureFields(string $pageName): iterable
@@ -25,19 +24,14 @@ class SlotCrudController extends AbstractCrudController
         yield TextField::new('title');
         yield TextEditorField::new('description');
 
-        yield AssociationField::new('resource')
-            ->setFormTypeOptions([
-                'by_reference' => false,
-                'required' => false,
-            ])
-            ->onlyOnForms()
-            ->autocomplete()
-        ;
 
-        yield DateTimeField::new('dateBegin');
-        yield DateTimeField::new('dateEnd');
+        yield AssociationField::new('parent')
+            ->autocomplete();
 
-        yield IntegerField::new('price');
+
+        yield DateTimeField::new('rgt')->hideOnForm()->hideOnIndex();
+        yield DateTimeField::new('lft')->hideOnForm()->hideOnIndex();
+        yield DateTimeField::new('level')->hideOnForm()->hideOnIndex();
 
         yield DateTimeField::new('createdAt')->hideOnForm();
         yield DateTimeField::new('updatedAt')->hideOnForm();
