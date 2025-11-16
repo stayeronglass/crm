@@ -20,6 +20,17 @@ class Service implements Timestampable, SoftDeleteable
     #[ORM\Column]
     private ?int $id = null;
 
+
+    #[ORM\Column]
+    #[Assert\NotNull]
+    #[Assert\Range(
+        notInRangeMessage: 'Приоритет услуги должет быть от {{ min }} до {{ max }}',
+        min: -1000,
+        max: 1000,
+    )]
+    private int $priority = 100;
+
+
     #[ORM\Column(length: 255, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3,max: 255,)]
@@ -28,9 +39,6 @@ class Service implements Timestampable, SoftDeleteable
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\NotBlank]
     private ?string $description;
-
-
-
 
     public function getId(): ?int
     {
@@ -65,5 +73,17 @@ class Service implements Timestampable, SoftDeleteable
     public function __toString():string
     {
         return $this->title;
+    }
+
+    public function getPriority(): ?int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
     }
 }

@@ -48,7 +48,12 @@ class Slot implements Timestampable, SoftDeleteable
 
     #[ORM\Column(type: Types::FLOAT, nullable: false)]
     #[Assert\NotNull]
-    #[Assert\GreaterThan(0)]
+    #[Assert\NotNull]
+    #[Assert\Range(
+        notInRangeMessage: 'Цена должна быть от {{ min }} до {{ max }}',
+        min: 1,
+        max: 1000000,
+    )]
     private ?float $price;
 
     public function getId(): ?int
