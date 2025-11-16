@@ -40,20 +40,26 @@
                 return now;
             }
             function showModal(event) {
-                function getResourceTitle(event) {
-                    const resourceId = event.resource ? event.resource.id : event.resourceIds[0];
-                    const resource = resources.find(r => r.id == resourceId);
-                    return resource ? resource.title : '';
+
+                //console.log(event)
+
+                document.getElementById('event_dateBegin').value = event.startStr;
+                document.getElementById('event_dateEnd').value = event.endStr;
+
+                document.getElementById('event_comment').value = "";
+
+                const selectElement = document.getElementById("event_resource");
+                const options = selectElement.getElementsByTagName("option");
+
+                for (let i = 0; i < options.length; i++) {
+                    options[i].selected = options[i].value === event.resource.id;
                 }
-                // document.getElementById('room-name').innerText = getResourceTitle(event);
-                // const startDate = dayjs(event.start);
-                // document.getElementById('date').innerText = startDate.format('YYYY/MM/DD');
-                // document.getElementById('start').value = startDate.format('HH:mm');
-                // document.getElementById('end').value = dayjs(event.end).format('HH:mm');
-                // document.getElementById('comment').value = event.title || '';
+
+
                 dialog.event = event;
                 dialog.showModal();
             }
+
             function hasOverlappingEvents(event) {
                 return getOverlappingEvents(event).length > 0;
             }
@@ -89,6 +95,7 @@
                 nowIndicator: true,
                 selectable: true,
                 select: function(event) {
+                    console.log(event)
                     if (hasOverlappingEvents(event)) {
                         ec.unselect();
                         return;
@@ -147,8 +154,12 @@
                                         $('#ajaxMessage').fadeIn(); // Show the alert
                                     });
                                 } else {
-                                    // Handle errors, e.g., display validation errors
-                                    console.error('Form submission failed:', data);
+                                    Object.keys(data.errors).forEach(key => {
+                                        console.log(data.errors[key][0])
+                                        $('#ajaxMessage').removeClass('alert-success').addClass('alert-danger');
+                                        $('#messageContent').text(data.errors[key][0]);
+                                        $('#ajaxMessage').fadeIn();
+                                    });
                                 }
                                 dialog.close();
                                 ec.refetchEvents();

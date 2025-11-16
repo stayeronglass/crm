@@ -9,6 +9,7 @@ use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -88,7 +89,10 @@ final class AjaxController extends AbstractController
     {
         $errors = [];
         foreach ($form->getErrors(true, false) as $error) {
-            $errors[] = $error->getMessage();
+            if ($error instanceof FormError)
+            {
+                $errors[] = $error->getMessage();
+            }
         }
 
         foreach ($form->all() as $childForm) {
