@@ -27,7 +27,7 @@ final class AjaxController extends AbstractController
     #[Route('/ajax/events', name: 'app_ajax_events')]
     public function events(Request $request, EventRepository $repository): Response
     {
-        $events = $repository->getEvents($request->get('start'),$request->get('end'));
+        $events = $repository->getEvents($request->get('start'), $request->get('end'));
 
 
         $result = [];

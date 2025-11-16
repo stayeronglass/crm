@@ -9,10 +9,13 @@
     </div>
     <br />
     <br />
-{% for i in m %}
-    <a class="btn btn-primary" href="{{ path('app_booking', {'id' : i.id}) }}">{{ i.title }}</a>
-{% endfor %}
 
+    <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
+{% for i in m %}
+    <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ i.id }}" href="javascript:void(0);">{{ i.title }}</a>
+{% endfor %}
+    <br />
+    <br />
         <div id="ec"></div>
 
         <dialog id="dialog" >
@@ -23,24 +26,7 @@
 
 
         <script type="text/javascript">
-            const events = [{
-                id: 1,
-                resourceIds: [1],
-                start: createDate(9, 0),
-                end: createDate(10, 30),
-                title: 'Editable Event',
-                editable: true,
-            }, {
-                id: 2,
-                resourceIds: [2],
-                start: createDate(11, 0),
-                end: createDate(13, 30),
-                title: 'Uneditable Event',
-                // editable: false, // not work
-                startEditable: false,
-                durationEditable: false,
-                backgroundColor: 'red',
-            }];
+
             const resources = {{ resources|json_encode()|raw }}
 
             function createDate(hours, minutes) {
@@ -162,6 +148,7 @@
                                     console.error('Form submission failed:', data);
                                 }
                                 dialog.close();
+                                ec.refetchEvents();
                             })
                             .catch(error => {
                                 console.error('Network error or server issue:', error);
@@ -169,6 +156,42 @@
                     });
                 }
             });
+
+            function getStaffMembers(elem){
+
+                let _staff_id = $(elem).data('staff_id');
+                let _staffMembers = [];
+
+                if (_staff_id === 0) {
+                    $('.bookly-js-staff-pills').each(function (index, element) {
+                        let id = $(element).data('staff_id');
+                        let title = $(element).text();
+                        if (id !== 0 ){
+                            _staffMembers.push({id: id, title: title});
+                        }
+
+                    })
+                } else {
+                    let id = $(elem).data('staff_id');
+                    let title = $(elem).text();
+                    _staffMembers.push({id: id, title: title});
+                }
+
+                return _staffMembers
+            }
+
+            jQuery(function ($) {
+                $staffLinks = $('.bookly-js-staff-pills')
+                $staffLinks.on('click', function (e) {
+                    e.preventDefault();
+                    $staffLinks.removeClass('active');
+                    $(this).addClass('active');
+
+
+                    ec.setOption('resources', getStaffMembers(this));
+                    ec.refetchEvents();
+                });
+            })
         </script>
 
 
