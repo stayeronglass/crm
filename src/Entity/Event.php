@@ -32,22 +32,31 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\GreaterThan('now', message: 'Дата начала не может быть в прошлом!')]
+    #[Assert\LessThan('next year', message: 'Слишком большая дата начала!')]
     private \DateTimeImmutable $dateBegin;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\GreaterThan(propertyPath: 'dateBegin', message: 'Дата начала должна быть больше даты кончания!')]
+    #[Assert\GreaterThan('now', message: 'Дата окончания не может быть в прошлом!')]
+    #[Assert\LessThan('next year', message: 'Слишком большая дата окончания!')]
     private \DateTimeImmutable $dateEnd;
 
     #[ORM\ManyToOne(targetEntity: Resource::class)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
     private ?Resource $resource;
 
     #[ORM\ManyToOne(targetEntity: Service::class)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
     private ?Service $service;
 
     #[ORM\ManyToOne(targetEntity: Slot::class)]
-    private ?Service $slot;
+    private ?Slot $slot;
 
     public function getId(): ?int
     {
