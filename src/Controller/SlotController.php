@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
+use App\Entity\Resource;
 use App\Entity\Slot;
+use App\Form\EventType;
 use App\Form\SlotType;
 use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,12 +18,29 @@ use Symfony\Component\Routing\Attribute\Route;
 final class SlotController extends AbstractController
 {
     #[Route(name: 'app_slot_index', methods: ['GET'])]
-    public function index(SlotRepository $slotRepository): Response
+    public function index(SlotRepository $slotRepository, EntityManagerInterface $em): Response
     {
+
+        $form = $this->createForm(Slot::class, new Slot(),[
+            'action' => $this->generateUrl('app_ajax_events_add'),
+            'method' => 'POST',
+        ]);
+
+        $res = $em->getRepository(Resource::class)->getResources();
+
         return $this->render('slot/index.html.twig', [
             'slots' => $slotRepository->findAll(),
+            'form' =>$form,
+            'res' => $res,
         ]);
     }
+
+
+
+
+
+
+
 
     #[Route('/new', name: 'app_slot_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

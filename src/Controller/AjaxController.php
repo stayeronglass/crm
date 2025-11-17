@@ -44,13 +44,7 @@ final class AjaxController extends AbstractController
         }
 
         return new JsonResponse($result);
-//        return new JsonResponse(
-//            '[
-//            {"start":"2025-11-13 1:00:00","end":"2025-11-13 2:00:00","resourceIds":[1],  "title": "Editable Event"},
-//            {"start":"2025-11-13 2:00:00","end":"2025-11-13 3:00:00","resourceIds":[2],  "title": "Editable Event"}
-//            ]',
-//            200, [], true
-//        );
+
     }
 
     #[Route('/ajax/events/add', name: 'app_ajax_events_add')]

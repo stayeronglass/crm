@@ -21,7 +21,7 @@ class Service implements Timestampable, SoftDeleteable
     private ?int $id = null;
 
 
-    #[ORM\Column]
+    #[ORM\Column(options: ['default' => 100])]
     #[Assert\NotNull]
     #[Assert\Range(
         notInRangeMessage: 'Приоритет услуги должет быть от {{ min }} до {{ max }}',
