@@ -57,9 +57,10 @@ class Slot implements Timestampable, SoftDeleteable
     )]
     private ?float $price;
 
-    #[ORM\Column(type: Types::STRING, nullable: false)]
+    #[ORM\Column(type: Types::STRING, length: 7, nullable: false)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 3,max: 10,)]
+    #[Assert\Length(min: 7,max: 7,)]
+    #[Assert\Regex('/^#[0-9a-f]{6}$/i')]
     private ?string $color;
 
 
@@ -157,6 +158,18 @@ class Slot implements Timestampable, SoftDeleteable
     public function __toString():string
     {
         return $this->title;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
     }
 
 }

@@ -58,6 +58,14 @@ class Event implements Timestampable, SoftDeleteable
     #[ORM\ManyToOne(targetEntity: Slot::class)]
     private ?Slot $slot;
 
+
+    #[ORM\Column(type: Types::STRING, length: 7, nullable: false)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 7,max: 7,)]
+    #[Assert\Regex('/^#[0-9a-f]{6}$/i')]
+    private ?string $color;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -131,6 +139,18 @@ class Event implements Timestampable, SoftDeleteable
     public function setSlot(?Slot $slot): static
     {
         $this->slot = $slot;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): static
+    {
+        $this->color = $color;
 
         return $this;
     }

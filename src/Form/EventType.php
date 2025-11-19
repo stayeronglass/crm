@@ -8,6 +8,7 @@ use App\Entity\Service;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,6 +38,10 @@ class EventType extends AbstractType
             ])
             ->add('comment', null, [
                 'label' => 'Комментарий',
+                'empty_data' => '',
+            ])
+            ->add('color', ColorType::class, [
+                'label' => 'Цвет',
                 'empty_data' => '',
             ])
             ->add('submit', SubmitType::class, [

@@ -40,7 +40,8 @@ final class AjaxController extends AbstractController
                 'title' => $slot->getService()->getTitle() . ': ' . $slot->getDescription(),
                 'start' => $slot->getDateBegin()->format('Y-m-d H:i:s'),
                 'end' => $slot->getDateEnd()->format('Y-m-d H:i:s'),
-                'resourceIds' => [$slot->getResource()->getId()]
+                'resourceIds' => [$slot->getResource()->getId()],
+                'backgroundColor' => $slot->getColor(),
             ];
         }
 
@@ -52,7 +53,8 @@ final class AjaxController extends AbstractController
                 'title' => $event->getService()->getTitle() . ': ' . $event->getComment(),
                 'start' => $event->getDateBegin()->format('Y-m-d H:i:s'),
                 'end' => $event->getDateEnd()->format('Y-m-d H:i:s'),
-                'resourceIds' => [$event->getResource()->getId()]
+                'resourceIds' => [$event->getResource()->getId()],
+                'backgroundColor' => $event->getColor(),
             ];
         }
 
