@@ -20,6 +20,31 @@ final class Version20251115152803 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql("create table crm.slot
+(
+    id          int auto_increment
+        primary key,
+    title       varchar(255) not null,
+    description longtext     null,
+    date_begin  datetime     not null comment '(DC2Type:datetimetz_immutable)',
+    date_end    datetime     not null comment '(DC2Type:datetimetz_immutable)',
+    created_at  datetime     not null,
+    updated_at  datetime     not null,
+    deleted_at  datetime     null,
+    price       double       not null,
+    resource_id int          null,
+    service_id  int          null,
+    color       varchar(6)   not null,
+);
+
+create index IDX_AC0E206789329D25
+    on crm.slot (resource_id);
+
+create index IDX_AC0E2067C0757D99B1F074C4
+    on crm.slot (date_begin, date_end);
+
+create index IDX_AC0E2067ED5CA9E6
+    on crm.slot (service_id);");
         $this->addSql('CREATE TABLE event (id INT AUTO_INCREMENT NOT NULL, resource_id INT DEFAULT NULL, service_id INT DEFAULT NULL, slot_id INT DEFAULT NULL, comment LONGTEXT DEFAULT NULL, date_begin DATETIME NOT NULL COMMENT \'(DC2Type:datetimetz_immutable)\', date_end DATETIME NOT NULL COMMENT \'(DC2Type:datetimetz_immutable)\', created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, deleted_at DATETIME DEFAULT NULL, INDEX IDX_3BAE0AA789329D25 (resource_id), INDEX IDX_3BAE0AA7ED5CA9E6 (service_id), INDEX IDX_3BAE0AA759E5119C (slot_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE resource (id INT AUTO_INCREMENT NOT NULL, tree_root INT DEFAULT NULL, parent_id INT DEFAULT NULL, title VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, date_begin DATETIME NOT NULL COMMENT \'(DC2Type:datetimetz_immutable)\', date_end DATETIME NOT NULL COMMENT \'(DC2Type:datetimetz_immutable)\', lft INT NOT NULL, lvl INT NOT NULL, rgt INT NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, deleted_at DATETIME DEFAULT NULL, INDEX IDX_BC91F416A977936C (tree_root), INDEX IDX_BC91F416727ACA70 (parent_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE resource_slot (resource_id INT NOT NULL, slot_id INT NOT NULL, INDEX IDX_A32E80DD89329D25 (resource_id), INDEX IDX_A32E80DD59E5119C (slot_id), PRIMARY KEY(resource_id, slot_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -30,9 +55,6 @@ final class Version20251115152803 extends AbstractMigration
         $this->addSql('ALTER TABLE event ADD CONSTRAINT FK_3BAE0AA759E5119C FOREIGN KEY (slot_id) REFERENCES slot (id)');
         $this->addSql('ALTER TABLE resource ADD CONSTRAINT FK_BC91F416A977936C FOREIGN KEY (tree_root) REFERENCES resource (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE resource ADD CONSTRAINT FK_BC91F416727ACA70 FOREIGN KEY (parent_id) REFERENCES resource (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE resource_slot ADD CONSTRAINT FK_A32E80DD89329D25 FOREIGN KEY (resource_id) REFERENCES resource (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE resource_slot ADD CONSTRAINT FK_A32E80DD59E5119C FOREIGN KEY (slot_id) REFERENCES slot (id) ON DELETE CASCADE');
-        $this->addSql('DROP TABLE resource_type');
         $this->addSql('ALTER TABLE slot ADD resource_id INT DEFAULT NULL, ADD service_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE slot ADD CONSTRAINT FK_AC0E206789329D25 FOREIGN KEY (resource_id) REFERENCES resource (id)');
         $this->addSql('ALTER TABLE slot ADD CONSTRAINT FK_AC0E2067ED5CA9E6 FOREIGN KEY (service_id) REFERENCES service (id)');
