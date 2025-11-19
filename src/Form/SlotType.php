@@ -18,26 +18,34 @@ class SlotType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
-            ->add('description')
+            ->add('title', null, [
+                'label' => 'Название',
+                ])
+            ->add('description', null, [
+                'label' => 'Описание',
+            ])
             ->add('price')
             ->add('dateBegin', null, [
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'label' => 'Начало',
             ])
             ->add('dateEnd', null, [
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'label' => 'Окончание',
             ])
 
             ->add('resource', EntityType::class, [
                 'class' => Resource::class,
                 'choice_label' => 'title',
-                'multiple' => true,
+                'multiple' => false,
+                'label' => 'Место',
             ])
 
             ->add('service', EntityType::class, [
                 'class' => Service::class,
                 'choice_label' => 'title',
-                'multiple' => true,
+                'multiple' => false,
+                'label' => 'Услуга',
             ])
 
 
@@ -55,6 +63,7 @@ class SlotType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Slot::class,
+            'csrf_protection' => false, // Disable CSRF for this specific form
         ]);
     }
 }

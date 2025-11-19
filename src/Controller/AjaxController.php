@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\Slot;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\ResourceRepository;
@@ -26,12 +27,24 @@ final class AjaxController extends AbstractController
     }
 
     #[Route('/ajax/events', name: 'app_ajax_events')]
-    public function events(Request $request, EventRepository $repository): Response
+    public function events(Request $request, EventRepository $repository, SlotRepository $slotRepository): Response
     {
         $events = $repository->getEvents($request->get('start'), $request->get('end'));
-
-
+        $slots = $slotRepository->getSlots($request->get('start'), $request->get('end'));
         $result = [];
+
+        /** @var Slot $slot */
+        foreach ($slots as $slot) {
+            $result[] = [
+                'id' => $slot->getId(),
+                'title' => $slot->getService()->getTitle() . ': ' . $slot->getDescription(),
+                'start' => $slot->getDateBegin()->format('Y-m-d H:i:s'),
+                'end' => $slot->getDateEnd()->format('Y-m-d H:i:s'),
+                'resourceIds' => [$slot->getResource()->getId()]
+            ];
+        }
+
+
         /** @var Event $event */
         foreach ($events as $event) {
             $result[] = [

@@ -7,6 +7,7 @@ use App\Entity\Resource;
 use App\Entity\Slot;
 use App\Form\EventType;
 use App\Form\SlotType;
+use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +19,12 @@ use Symfony\Component\Routing\Attribute\Route;
 final class SlotController extends AbstractController
 {
     #[Route(name: 'app_slot_index', methods: ['GET'])]
-    public function index(SlotRepository $slotRepository, EntityManagerInterface $em): Response
+    public function index(ResourceRepository $repository, SlotRepository $slotRepository, EntityManagerInterface $em): Response
     {
+        $m = $repository->findBy(['parent' => null]);
 
-        $form = $this->createForm(Slot::class, new Slot(),[
-            'action' => $this->generateUrl('app_ajax_events_add'),
+        $form = $this->createForm(SlotType::class, new Slot(),[
+            'action' => $this->generateUrl('app_ajax_slot_add'),
             'method' => 'POST',
         ]);
 
@@ -31,7 +33,8 @@ final class SlotController extends AbstractController
         return $this->render('slot/index.html.twig', [
             'slots' => $slotRepository->findAll(),
             'form' =>$form,
-            'res' => $res,
+            'resources' => $res,
+            'm' => $m,
         ]);
     }
 

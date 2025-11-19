@@ -1,47 +1,234 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Slot index{% endblock %}
+{% block title %}Hello DefaultController!{% endblock %}
 
 {% block body %}
-    <h1>Slot index</h1>
+    <div class="alert  alert-dismissible fade" role="alert" id="ajaxMessage" style="display: none;">
+        <span id="messageContent">111</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <br />
+    <br />
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>DateBegin</th>
-                <th>DateEnd</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>DeletedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for slot in slots %}
-            <tr>
-                <td>{{ slot.id }}</td>
-                <td>{{ slot.title }}</td>
-                <td>{{ slot.description }}</td>
-                <td>{{ slot.dateBegin ? slot.dateBegin|date('Y-m-d H:i:s T') : '' }}</td>
-                <td>{{ slot.dateEnd ? slot.dateEnd|date('Y-m-d H:i:s T') : '' }}</td>
-                <td>{{ slot.createdAt ? slot.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ slot.updatedAt ? slot.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ slot.deletedAt ? slot.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_slot_show', {'id': slot.id}) }}">show</a>
-                    <a href="{{ path('app_slot_edit', {'id': slot.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
+    {% for i in m %}
+        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ i.id }}" href="javascript:void(0);">{{ i.title }}</a>
+    {% endfor %}
 
-    <a href="{{ path('app_slot_new') }}">Create new</a>
+    <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
+
+    <br />
+    <br />
+    <div id="ec"></div>
+
+    <dialog id="dialog" >
+        <h1>Новый Слот</h1>
+        {{ form(form, {'attr': {'id': 'form_slot'}}) }}
+    </dialog>
+
+
+
+    <script type="text/javascript">
+
+        const resources = {{ resources|json_encode()|raw }}
+
+            function createDate(hours, minutes) {
+                const now = new Date();
+                now.setHours(hours);
+                now.setMinutes(minutes);
+                now.setSeconds(0);
+                return now;
+            }
+        function showModal(event) {
+
+            //console.log(event)
+
+            document.getElementById('slot_dateBegin').value = event.startStr;
+            document.getElementById('slot_dateEnd').value = event.endStr;
+
+            document.getElementById('slot_description').value = "";
+
+            const selectElement = document.getElementById("slot_resource");
+            const options = selectElement.getElementsByTagName("option");
+
+            for (let i = 0; i < options.length; i++) {
+                options[i].selected = options[i].value === event.resource.id;
+            }
+
+
+            dialog.event = event;
+            dialog.showModal();
+        }
+
+        function hasOverlappingEvents(event) {
+            return getOverlappingEvents(event).length > 0;
+        }
+        function hasOtherOverlappingEvents(event) {
+            return getOverlappingEvents(event).filter(e => e.id != event.id).length > 0
+        }
+        function getOverlappingEvents(event) {
+            // select event has event.resource.id
+            // eventDrop event has event.resourceIds
+            const rId = event.resource ? event.resource.id : event.resourceIds[0];
+            return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && event.start < e.end);
+        }
+
+        const ec = EventCalendar.create(document.getElementById('ec'), {
+            view: 'resourceTimeGridDay',
+            headerToolbar: {
+                start: 'prev,next today',
+                center: 'title',
+                end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek resourceTimeGridWeek,resourceTimelineWeek'
+            },
+            resources: resources,
+            scrollTime: '09:00:00',
+            eventSources: [{
+                url: '{{ path('app_ajax_slot') }}',
+                method: 'POST',
+                extraParams: function () {
+                    return {
+
+                    };
+                }
+            }],
+            dayMaxEvents: true,
+            nowIndicator: true,
+            selectable: true,
+            select: function(event) {
+                console.log(event)
+                if (hasOverlappingEvents(event)) {
+                    ec.unselect();
+                    return;
+                }
+                showModal(event);
+            },
+        });
+
+
+        async  function getResources() {
+            let result = null;
+            $.ajax({
+                url: "{{ path('app_ajax_resources') }}",
+                method: "GET",
+                async: false, // This makes the call synchronous
+                success: function(data) {
+                    result = data;
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                }
+            });
+            console.log(result)
+            return result; // This will now return the data after the synchronous call completes
+        }
+
+        function _pad(num) {
+            let norm = Math.floor(Math.abs(num));
+            return (norm < 10 ? '0' : '') + norm;
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('[name="event"]');
+
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const formData = new FormData(form); // Or serialize to JSON
+
+                    fetch(form.action, {
+                        method: form.method,
+                        body: formData, // Or JSON.stringify(Object.fromEntries(formData))
+                        headers: {
+                            'Accept': 'application/json' // Expecting JSON response
+                        }
+                    })
+                        .then(response => response.json()) // Parse JSON response
+                        .then(data => {
+                            if (data.success) {
+                                data.flashMessages.forEach(function(flash) {
+                                    // Create and append a div for the flash message
+                                    $.notify(flash, "success");
+                                });
+                            } else {
+                                Object.keys(data.errors).forEach(key => {
+                                    console.log(data.errors)
+                                    $.notify(data.errors[key][0],"error");
+                                });
+                            }
+                            dialog.close();
+                            ec.refetchEvents();
+                        })
+                        .catch(error => {
+                            console.error('Network error or server issue:', error);
+                        });
+                });
+            }
+        });
+
+        function getStaffMembers(elem){
+
+            let _staff_id = $(elem).data('staff_id');
+            let _staffMembers = [];
+
+            if (_staff_id === 0) {
+                $('.bookly-js-staff-pills').each(function (index, element) {
+                    let id = $(element).data('staff_id');
+                    let title = $(element).text();
+                    if (id !== 0 ){
+                        _staffMembers.push({id: id, title: title});
+                    }
+
+                })
+            } else {
+                let id = $(elem).data('staff_id');
+                let title = $(elem).text();
+                _staffMembers.push({id: id, title: title});
+            }
+
+            return _staffMembers
+        }
+
+        jQuery(function ($) {
+            $staffLinks = $('.bookly-js-staff-pills')
+            $staffLinks.on('click', function (e) {
+                e.preventDefault();
+                $staffLinks.removeClass('active');
+                $(this).addClass('active');
+
+
+                ec.setOption('resources', getStaffMembers(this));
+                ec.refetchEvents();
+            });
+        })
+    </script>
+
+
 {% endblock %}
+
+    {% block javascripts %}
+        <script src="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.7.1/dist/event-calendar.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/dayjs.min.js"></script>
+    {% endblock %}
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.7.1/dist/event-calendar.min.css">
+
+        <style>
+            .ec-timeline .ec-time, .ec-timeline .ec-line {
+                width: 16px;
+            }
+            .ec-timeline .ec-time {
+                overflow: visible;
+            }
+            .ec-timeline .ec-time time {
+                display: inline-block;
+                width: 64px;
+                text-align: center;
+            }
+        </style>
+    {% endblock %}
+
+
+

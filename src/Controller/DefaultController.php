@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
+use App\Repository\EventRepository;
 use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,10 +28,9 @@ final class DefaultController extends AbstractController
     }
 
     #[Route('/', name: 'app_default')]
-    public function index(ResourceRepository $repository, SlotRepository $slotRepository): Response
+    public function index(ResourceRepository $repository): Response
     {
         $m = $repository->findBy(['parent' => null]);
-        $events = $slotRepository->getEvents();
         $form = $this->createForm(EventType::class, new Event(),[
             'action' => $this->generateUrl('app_ajax_events_add'),
             'method' => 'POST',
@@ -39,7 +39,6 @@ final class DefaultController extends AbstractController
         $res = $repository->getResources();
         return $this->render('default/index.html.twig', [
             'form' => $form,
-            'events' => $events,
             'resources' => $res,
             'm' => $m,
         ]);
