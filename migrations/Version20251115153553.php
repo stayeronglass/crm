@@ -20,9 +20,7 @@ final class Version20251115153553 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE resource_slot DROP FOREIGN KEY FK_A32E80DD59E5119C');
-        $this->addSql('ALTER TABLE resource_slot DROP FOREIGN KEY FK_A32E80DD89329D25');
-        $this->addSql('DROP TABLE resource_slot');
+        $this->addSql('DROP TABLE IF EXISTS resource_slot');
     }
 
     public function down(Schema $schema): void
