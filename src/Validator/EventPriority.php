@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute]
 class EventPriority extends Constraint
 {
-    public string $message = 'The string "{{ string }}" contains an illegal character: it can only contain letters or numbers.';
+    public string $message = 'Нельзя сделать поверх события с большим приоритетом!';
     public string $mode = 'strict';
 
     // all configurable options must be passed to the constructor

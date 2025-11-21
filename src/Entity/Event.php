@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Index(columns: ['date_begin','date_end'])]
 #[EventPriority]
+#[Slot]
 class Event implements Timestampable, SoftDeleteable
 {
     use TimestampableEntity, SoftDeleteableEntity;
