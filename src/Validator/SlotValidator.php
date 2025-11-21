@@ -2,23 +2,24 @@
 namespace App\Validator;
 
 use App\Repository\EventRepository;
+use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-class EventPriorityValidator extends ConstraintValidator
+class SlotValidator extends ConstraintValidator
 {
 
 
-    public function __construct(private EventRepository $repository)
+    public function __construct(private SlotRepository $repository)
     {
     }
 
     public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$constraint instanceof EventPriority) {
+        if (!$constraint instanceof Slot) {
             throw new UnexpectedTypeException($constraint, EventPriority::class);
         }
 
@@ -28,26 +29,23 @@ class EventPriorityValidator extends ConstraintValidator
             return;
         }
 
-        $events = $this->repository->createQueryBuilder('c')
-            ->innerJoin('c.service', 's')
-            ->andWhere('c.dateBegin > :dateBegin')
-            ->andWhere('c.dateEnd > :dateEnd')
-            ->andWhere('s.priority > :priority')
-            ->andWhere('c.resource = :resource')
+        $slots = $this->repository->createQueryBuilder('s')
+            ->andWhere('s.dateBegin <= :dateBegin')
+            ->andWhere('s.dateEnd >= :dateEnd')
+            ->andWhere('s.resource = :resource')
+            ->andWhere('s.service = :service')
             ->setParameter('dateBegin', $value->getDateBegin())
             ->setParameter('dateEnd', $value->getDateEnd())
-            ->setParameter('priority', $value->getService()->getPriority())
             ->setParameter('resource', $value->getResource())
+            ->setParameter('service', $value->getService())
             ->setMaxResults(1)
-            ->getQuery()
+            ->getQuery()->getResult()
         ;
 
-        dd($events->getSQL());
 
-        if (!empty($events)) {
+        if (empty($slots)) {
             $this->context
-                ->buildViolation($constraint->userDoesNotMatchMessage)
-                ->atPath('user.email')
+                ->buildViolation($constraint->message)
                 ->addViolation();
         }
     }
