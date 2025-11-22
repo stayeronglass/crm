@@ -12,7 +12,7 @@ class EventPriorityValidator extends ConstraintValidator
 {
 
 
-    public function __construct(private EventRepository $repository)
+    public function __construct(private readonly EventRepository $repository)
     {
     }
 
@@ -30,8 +30,8 @@ class EventPriorityValidator extends ConstraintValidator
 
         $events = $this->repository->createQueryBuilder('c')
             ->innerJoin('c.service', 's')
-            ->andWhere('c.dateBegin > :dateBegin')
-            ->andWhere('c.dateEnd > :dateEnd')
+            ->andWhere('c.dateBegin < :dateEnd')
+            ->andWhere('c.dateEnd > :dateBegin')
             ->andWhere('s.priority > :priority')
             ->andWhere('c.resource = :resource')
             ->setParameter('dateBegin', $value->getDateBegin())
@@ -40,13 +40,12 @@ class EventPriorityValidator extends ConstraintValidator
             ->setParameter('resource', $value->getResource())
             ->setMaxResults(1)
             ->getQuery()
+            ->getResult()
         ;
-
-        dd($events->getSQL());
 
         if (!empty($events)) {
             $this->context
-                ->buildViolation($constraint->userDoesNotMatchMessage)
+                ->buildViolation($constraint->message)
                 ->atPath('user.email')
                 ->addViolation();
         }

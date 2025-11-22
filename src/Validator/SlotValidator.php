@@ -13,7 +13,7 @@ class SlotValidator extends ConstraintValidator
 {
 
 
-    public function __construct(private SlotRepository $repository)
+    public function __construct(private readonly SlotRepository $repository)
     {
     }
 
