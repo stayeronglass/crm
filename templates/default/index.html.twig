@@ -70,7 +70,7 @@
                 // select event has event.resource.id
                 // eventDrop event has event.resourceIds
                 const rId = event.resource ? event.resource.id : event.resourceIds[0];
-                return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && event.start < e.end);
+                return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && e.end > event.start );
             }
 
             const ec = EventCalendar.create(document.getElementById('ec'), {
@@ -78,7 +78,7 @@
                 headerToolbar: {
                     start: 'prev,next today',
                     center: 'title',
-                    end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek resourceTimeGridWeek,resourceTimelineWeek'
+                    end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
                 },
                 resources: resources,
                 scrollTime: '09:00:00',
@@ -91,16 +91,25 @@
                         };
                     }
                 }],
-                dayMaxEvents: true,
+                allDaySlot: false,
+                slotMinTime: '09:00:00',
+                slotMaxTime: '23:00:00',
                 nowIndicator: true,
                 selectable: true,
                 select: function(event) {
                     console.log(event)
                     if (hasOverlappingEvents(event)) {
+                        $.notify("Нельзя делать пересекающиеся события", "error");
                         ec.unselect();
                         return;
                     }
                     showModal(event);
+                },
+                eventResize: function ({ event, revert }) {
+                    if (hasOtherOverlappingEvents(event)){
+                        $.notify("Нельзя делать пересекающиеся события", "error");
+                        revert();
+                    }
                 },
             });
 
@@ -153,8 +162,12 @@
                                     });
                                 } else {
                                     Object.keys(data.errors).forEach(key => {
-                                        console.log(data.errors)
-                                        $.notify(data.errors[key][0],"error");
+                                        if (data.errors[key][0].length > 1)
+                                        {
+                                            $.notify(data.errors[key][0],"error");
+                                        } else {
+                                            $.notify(data.errors[key],"error");
+                                        }
                                     });
                                 }
                                 dialog.close();

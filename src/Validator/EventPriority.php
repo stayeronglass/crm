@@ -22,4 +22,9 @@ class EventPriority extends Constraint
     {
         return self::CLASS_CONSTRAINT;
     }
+
+    public function validatedBy(): string
+    {
+        return static::class.'Validator';
+    }
 }

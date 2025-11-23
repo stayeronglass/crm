@@ -28,25 +28,24 @@ class EventPriorityValidator extends ConstraintValidator
             return;
         }
 
-        $events = $this->repository->createQueryBuilder('c')
-            ->innerJoin('c.service', 's')
-            ->andWhere('c.dateBegin < :dateEnd')
-            ->andWhere('c.dateEnd > :dateBegin')
-            ->andWhere('s.priority > :priority')
-            ->andWhere('c.resource = :resource')
-            ->setParameter('dateBegin', $value->getDateBegin())
-            ->setParameter('dateEnd', $value->getDateEnd())
-            ->setParameter('priority', $value->getService()->getPriority())
-            ->setParameter('resource', $value->getResource())
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getResult()
-        ;
+//        $events = $this->repository->createQueryBuilder('c')
+//            ->innerJoin('c.service', 's')
+//            ->andWhere('c.dateBegin < :dateEnd')
+//            ->andWhere('c.dateEnd > :dateBegin')
+//            ->andWhere('s.priority > :priority')
+//            ->andWhere('c.resource = :resource')
+//            ->setParameter('dateBegin', $value->getDateBegin())
+//            ->setParameter('dateEnd', $value->getDateEnd())
+//            ->setParameter('priority', $value->getService()->getPriority())
+//            ->setParameter('resource', $value->getResource())
+//            ->setMaxResults(1)
+//            ->getQuery()
+//            ->getResult()
+//        ;
 
         if (!empty($events)) {
             $this->context
                 ->buildViolation($constraint->message)
-                ->atPath('user.email')
                 ->addViolation();
         }
     }

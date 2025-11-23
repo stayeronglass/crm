@@ -13,11 +13,12 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Timestampable;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator as AcmeAssert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Index(columns: ['date_begin','date_end'])]
-#[EventPriority]
-#[Slot]
+#[AcmeAssert\EventPriority]
+#[AcmeAssert\Slot]
 class Event implements Timestampable, SoftDeleteable
 {
     use TimestampableEntity, SoftDeleteableEntity;

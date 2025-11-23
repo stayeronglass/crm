@@ -29,24 +29,23 @@ class SlotValidator extends ConstraintValidator
             return;
         }
 
-        $slots = $this->repository->createQueryBuilder('s')
-            ->andWhere('s.dateBegin <= :dateBegin')
-            ->andWhere('s.dateEnd >= :dateEnd')
-            ->andWhere('s.resource = :resource')
-            ->andWhere('s.service = :service')
-            ->setParameter('dateBegin', $value->getDateBegin())
-            ->setParameter('dateEnd', $value->getDateEnd())
-            ->setParameter('resource', $value->getResource())
-            ->setParameter('service', $value->getService())
-            ->setMaxResults(1)
-            ->getQuery()->getResult()
-        ;
+//        $slots = $this->repository->createQueryBuilder('s')
+//            ->andWhere('s.dateBegin >= :dateBegin')
+//            ->andWhere('s.dateEnd <= :dateEnd')
+//            ->andWhere('s.resource = :resource')
+//            ->andWhere('s.service = :service')
+//            ->setParameter('dateBegin', $value->getDateBegin())
+//            ->setParameter('dateEnd', $value->getDateEnd())
+//            ->setParameter('resource', $value->getResource())
+//            ->setParameter('service', $value->getService())
+//            ->setMaxResults(1)
+//
+//        ;
 
-
-        if (empty($slots)) {
-            $this->context
-                ->buildViolation($constraint->message)
-                ->addViolation();
-        }
+//        if (empty($slots->getQuery()->getResult())) {
+//            $this->context
+//                ->buildViolation($constraint->message)
+//                ->addViolation();
+//        }
     }
 }

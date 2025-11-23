@@ -13,6 +13,7 @@ use Gedmo\Timestampable\Timestampable;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[\Attribute]
 #[ORM\Entity(repositoryClass: SlotRepository::class)]
 #[ORM\Index(columns: ['date_begin','date_end'])]
 class Slot implements Timestampable, SoftDeleteable

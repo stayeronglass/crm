@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\Slot;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use function Symfony\Component\Clock\now;
 
 final class DefaultController extends AbstractController
 {
@@ -28,8 +31,9 @@ final class DefaultController extends AbstractController
     }
 
     #[Route('/', name: 'app_default')]
-    public function index(ResourceRepository $repository): Response
+    public function index(ResourceRepository $repository, EntityManagerInterface $em): Response
     {
+
         $m = $repository->findBy(['parent' => null]);
         $form = $this->createForm(EventType::class, new Event(),[
             'action' => $this->generateUrl('app_ajax_events_add'),
