@@ -34,6 +34,8 @@ final class AjaxSlotController extends AbstractController
                 'end' => $slot->getDateEnd()->format('Y-m-d H:i:s'),
                 'resourceIds' => [$slot->getResource()->getId()],
                 'backgroundColor' => $slot->getColor(),
+                'display' => 'background',
+                'editable' => false,
             ];
         }
 

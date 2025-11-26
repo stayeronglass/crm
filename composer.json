@@ -4,6 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
+        "stayeronglass/better-fosuser-bundle": "dev-master@dev",
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",

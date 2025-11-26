@@ -3,6 +3,13 @@
 {% block title %}Hello DefaultController!{% endblock %}
 
 {% block body %}
+    <style>
+        .ec-header .ec-day {
+            height: auto;
+            overflow:auto;
+            font-weight: bold;
+        }
+    </style>
     <div class="alert  alert-dismissible fade" role="alert" id="ajaxMessage" style="display: none;">
         <span id="messageContent">111</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -80,8 +87,26 @@
                     center: 'title',
                     end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
                 },
+                titleFormat : function(start, end) {
+                    const options = {
+                        weekday: 'long', // Full day of the week (e.g., 'понедельник')
+                        month: 'long',   // Full month name (e.g., 'ноябрь')
+                        day: 'numeric',  // Day of the month (e.g., '23')
+                    };
+
+                    const s = new Intl.DateTimeFormat('ru-RU', options).format(start);
+
+                    return {html: s};
+                },
+                resourceLabelContent: function (info){
+                    return {
+                        html: info.resource.title
+                    }
+                },
+                unselectAuto :true,
                 resources: resources,
                 scrollTime: '09:00:00',
+                //slotLabelInterval:'00:30:00',
                 eventSources: [{
                     url: '{{ path('app_ajax_events') }}',
                     method: 'POST',
