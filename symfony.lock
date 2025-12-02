@@ -62,6 +62,9 @@
             "./bin/phpunit"
         ]
     },
+    "stayeronglass/better-fosuser-bundle": {
+        "version": "dev-master"
+    },
     "symfony/asset-mapper": {
         "version": "7.3",
         "recipe": {
