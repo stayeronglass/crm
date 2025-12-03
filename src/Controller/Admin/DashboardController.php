@@ -12,13 +12,15 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
+
     public function index(): Response
     {
-        return parent::index();
+        return $this->render('admin/index.html.twig');
     }
 
     public function configureDashboard(): Dashboard
@@ -31,12 +33,12 @@ class DashboardController extends AbstractDashboardController
     {
          return Crud::new()
             ->setDateTimeFormat('dd.MM.yyyy HH:mm')
-             ;
+         ;
     }
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::linkToDashboard('Главная', 'fa fa-home');
 
         yield MenuItem::section('CRM', 'admin');
         yield MenuItem::linkToCrud('Мастерские', 'fa fa-tags', Resource::class);
@@ -44,6 +46,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Слоты', 'fa fa-tags', Slot::class);
         yield MenuItem::linkToCrud('Записи', 'fa fa-tags', Event::class);
 
-        yield MenuItem::linkToLogout('Logout', 'fa fa-exit');
+        yield MenuItem::section('Служебные', 'admin');
+        yield MenuItem::linkToLogout('Выход', 'fa fa-exit');
     }
 }
