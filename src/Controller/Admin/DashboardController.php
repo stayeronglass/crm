@@ -7,6 +7,7 @@ use App\Entity\Resource;
 use App\Entity\Service;
 use App\Entity\Slot;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -25,6 +26,12 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle('Chalet CRM')
             ;
+    }
+    public function configureCrud(): Crud
+    {
+         return Crud::new()
+            ->setDateTimeFormat('dd.MM.yyyy HH:mm')
+             ;
     }
 
     public function configureMenuItems(): iterable
