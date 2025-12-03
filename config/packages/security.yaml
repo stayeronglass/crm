@@ -20,11 +20,12 @@ security:
                 secure: false
                 httponly: true
             lazy: true
-            provider: users_in_memory
             user_checker: fos_user.user_checker
             form_login:
                 provider: fos_userbundle
-        logout:       true
+                use_referer: true
+            logout:
+                path: fos_user_security_logout
 
     role_hierarchy:
         ROLE_MASTER: ROLE_USER
@@ -37,7 +38,9 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/login$, role: PUBLIC_ACCESS  }
+         - { path: ^/register, role: PUBLIC_ACCESS  }
+         - { path: ^/resetting, role: PUBLIC_ACCESS  }
 
 when@test:
     security:

@@ -37,6 +37,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Слоты', 'fa fa-tags', Slot::class);
         yield MenuItem::linkToCrud('Записи', 'fa fa-tags', Event::class);
 
-        //yield MenuItem::linkToLogout('Logout', 'fa fa-exit');
+        yield MenuItem::linkToLogout('Logout', 'fa fa-exit');
     }
 }
