@@ -34,38 +34,7 @@ final class DefaultController extends AbstractController
     public function index(ResourceRepository $repository, EntityManagerInterface $em): Response
     {
 
-        $form = $this->createForm(EventType::class, new Event(),[
-            'action' => $this->generateUrl('app_ajax_events_add'),
-            'method' => 'POST',
-            ]);
-
-        $repository->setChildrenIndex('children');
-        $resources = [];
-        $roots = $repository->getRootNodes();
-
-        foreach ($roots as $r){
-            $tree = $repository->childrenHierarchy(
-                $r, /* starting node (null for entire tree) */
-                false, /* direct children only */
-                [], /* options */
-                false /* include the root node in the result */
-            );
-            if (count($tree) == 0 ){
-                $resources[] = [
-                    'id' => $r->getId(),
-                    'title' => $r->getTitle(),
-                ];
-            }
-            foreach ($tree as $t){
-                $t['title'] = $r->getTitle() . '/' . $t['title'] ;
-                $resources[] = $t;
-            }
-        }
-
         return $this->render('default/index.html.twig', [
-            'form' => $form,
-            'resources' => $resources,
-            'm' => $resources,
         ]);
     }
 

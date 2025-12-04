@@ -1,29 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Слоты{% endblock %}
+{% block title %}Записи{% endblock %}
 
 {% block body %}
+    <style>
+        .ec-header .ec-day {
+            height: auto;
+            overflow:auto;
+            font-weight: bold;
+        }
+    </style>
     <div class="alert  alert-dismissible fade" role="alert" id="ajaxMessage" style="display: none;">
         <span id="messageContent">111</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <br />
-    <br />
+    <div class="d-flex gap-2 justify-content-center py-5">
+        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
+        {% for i in m %}
+            <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ i.id }}" href="javascript:void(0);">{{ i.title }}</a>
+        {% endfor %}
+        <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
+    </div>
 
-    <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
-    {% for i in m %}
-        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ i.id }}" href="javascript:void(0);">{{ i.title }}</a>
-    {% endfor %}
-
-    <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
 
     <br />
     <br />
     <div id="ec"></div>
 
     <dialog id="dialog" >
-        <h1>Новый Слот</h1>
-        {{ form(form, {'attr': {'id': 'form_slot'}}) }}
+        <h1>Новая Запись</h1>
+        {{ form(form, {'attr': {'id': 'form_event'}}) }}
     </dialog>
 
 
@@ -43,12 +49,12 @@
 
             //console.log(event)
 
-            document.getElementById('slot_dateBegin').value = event.startStr;
-            document.getElementById('slot_dateEnd').value = event.endStr;
+            document.getElementById('event_dateBegin').value = event.startStr;
+            document.getElementById('event_dateEnd').value = event.endStr;
 
-            document.getElementById('slot_description').value = "";
+            document.getElementById('event_comment').value = "";
 
-            const selectElement = document.getElementById("slot_resource");
+            const selectElement = document.getElementById("event_resource");
             const options = selectElement.getElementsByTagName("option");
 
             for (let i = 0; i < options.length; i++) {
@@ -70,7 +76,7 @@
             // select event has event.resource.id
             // eventDrop event has event.resourceIds
             const rId = event.resource ? event.resource.id : event.resourceIds[0];
-            return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && event.start < e.end);
+            return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && e.end > event.start );
         }
 
         const ec = EventCalendar.create(document.getElementById('ec'), {
@@ -78,12 +84,30 @@
             headerToolbar: {
                 start: 'prev,next today',
                 center: 'title',
-                end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek resourceTimeGridWeek,resourceTimelineWeek'
+                end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
             },
+            titleFormat : function(start, end) {
+                const options = {
+                    weekday: 'long', // Full day of the week (e.g., 'понедельник')
+                    month: 'long',   // Full month name (e.g., 'ноябрь')
+                    day: 'numeric',  // Day of the month (e.g., '23')
+                };
+
+                const s = new Intl.DateTimeFormat('ru-RU', options).format(start);
+
+                return {html: s};
+            },
+            resourceLabelContent: function (info){
+                return {
+                    html: info.resource.title
+                }
+            },
+            unselectAuto :true,
             resources: resources,
             scrollTime: '09:00:00',
+            //slotLabelInterval:'00:30:00',
             eventSources: [{
-                url: '{{ path('app_ajax_slot') }}',
+                url: '{{ path('app_ajax_events') }}',
                 method: 'POST',
                 extraParams: function () {
                     return {
@@ -91,16 +115,25 @@
                     };
                 }
             }],
-            dayMaxEvents: true,
+            allDaySlot: false,
+            slotMinTime: '09:00:00',
+            slotMaxTime: '23:00:00',
             nowIndicator: true,
             selectable: true,
             select: function(event) {
                 console.log(event)
                 if (hasOverlappingEvents(event)) {
+                    $.notify("Нельзя делать пересекающиеся события", "error");
                     ec.unselect();
                     return;
                 }
                 showModal(event);
+            },
+            eventResize: function ({ event, revert }) {
+                if (hasOtherOverlappingEvents(event)){
+                    $.notify("Нельзя делать пересекающиеся события", "error");
+                    revert();
+                }
             },
         });
 
@@ -153,8 +186,12 @@
                                 });
                             } else {
                                 Object.keys(data.errors).forEach(key => {
-                                    console.log(data.errors)
-                                    $.notify(data.errors[key][0],"error");
+                                    if (data.errors[key][0].length > 1)
+                                    {
+                                        $.notify(data.errors[key][0],"error");
+                                    } else {
+                                        $.notify(data.errors[key],"error");
+                                    }
                                 });
                             }
                             dialog.close();
@@ -229,6 +266,3 @@
             }
         </style>
     {% endblock %}
-
-
-

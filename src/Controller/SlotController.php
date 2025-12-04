@@ -14,8 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/slot')]
+#[IsGranted('ROLE_MANAGER')]
 final class SlotController extends AbstractController
 {
     #[Route(name: 'app_slot_index', methods: ['GET'])]

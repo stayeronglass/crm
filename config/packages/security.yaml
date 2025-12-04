@@ -31,7 +31,7 @@ security:
         ROLE_MASTER: ROLE_USER
         ROLE_SELLER: ROLE_USER
         ROLE_MANAGER: ROLE_USER
-        ROLE_ADMIN: [ROLE_MASTER, ROLE_SELLER, ROLE_USER]
+        ROLE_ADMIN: [ROLE_MASTER, ROLE_SELLER, ROLE_USER, ROLE_MANAGER]
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
 
     # Easy way to control access for large sections of your site
