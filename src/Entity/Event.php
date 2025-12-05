@@ -68,6 +68,29 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\Regex('/^#[0-9a-f]{6}$/i')]
     private ?string $color;
 
+    #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 10,max: 10,)]
+    #[Assert\Regex('/^#[0-9]{10}$/i')]
+    private ?string $clientPhone;
+
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3,max: 255,)]
+    private ?string $clientName;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3,max: 255,)]
+    #[Assert\Email]
+    private ?string $clientEmail;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 1,max: 100,)]
+    private ?string $clientsNumber;
+
 
     public function getId(): ?int
     {

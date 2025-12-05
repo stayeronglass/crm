@@ -14,7 +14,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[IsGranted(new Expression('is_granted("ROLE_MANAGER") or is_granted("ROLE_MASTER") or is_granted("ROLE_SELLER")'))]
 final class EventController extends AbstractController
 {
-    #[Route('/event', name: 'app_event')]
+    #[Route('/events', name: 'app_events')]
     public function index(ResourceRepository $repository, EntityManagerInterface $em): Response
     {
 

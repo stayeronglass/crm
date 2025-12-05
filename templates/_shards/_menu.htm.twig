@@ -8,7 +8,7 @@
             <ul class="navbar-nav">
                 {% if is_granted('ROLE_SELLER') or is_granted('ROLE_MASTER') or is_granted('ROLE_MANAGER')%}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ path('app_event') }}">Записи</a>
+                        <a class="nav-link active" aria-current="page" href="{{ path('app_events') }}">Записи</a>
                     </li>
                 {% endif %}
                 {% if is_granted('ROLE_MANAGER') %}
