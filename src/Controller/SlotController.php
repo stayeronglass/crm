@@ -11,6 +11,7 @@ use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,7 +26,7 @@ final class SlotController extends AbstractController
         $m = $repository->findBy(['parent' => null]);
 
         $form = $this->createForm(SlotType::class, new Slot(),[
-            'action' => $this->generateUrl('app_ajax_slot_add'),
+            'action' => $this->generateUrl('app_slot_add'),
             'method' => 'POST',
         ]);
 
@@ -37,6 +38,54 @@ final class SlotController extends AbstractController
             'resources' => $res,
             'm' => $m,
         ]);
+    }
+    #[Route(name: 'app_slot_add', methods: ['POST'])]
+    public function add(Request $request, EntityManagerInterface $em)
+    {
+        $slot = new Slot();
+
+
+        $form = $this->createForm(SlotType::class, $slot);
+        $form->handleRequest($request);
+
+        $current = $slot->getDateBegin();
+
+        $repeat = !empty($form->get('dayOfWeek')->getData());
+        if ($repeat) $repeatData = array_flip($form->get('dayOfWeek')->getData());
+
+        while ($repeat && $current <= $slot->getDateEnd()){
+
+            $dayOfWeekNumericISO = $current->format('N');
+            if($repeatData[$dayOfWeekNumericISO] ?? false){
+                $newSlot = clone $slot;
+                dump($repeatData);
+                dd($dayOfWeekNumericISO);
+
+                $newSlot->setDateBegin($current->setTime($slot->getDateBegin()->format('H'),$slot->getDateBegin()->format('i')));
+                $newSlot->setDateEnd($current->setTime($slot->getDateEnd()->format('H'),$slot->getDateEnd()->format('i')));
+
+                $em->persist($newSlot);
+
+            }
+
+
+
+            $current = $current->add(new \DateInterval('P1D'));
+        }
+
+        dd('???');
+        if (!$repeat) $em->persist($slot);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $em->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'flashMessages' => ['Создано!']
+            ]);
+        }
+        return $this->redirect('app_slot_index');
     }
 
 

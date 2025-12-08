@@ -2,73 +2,54 @@
 
 namespace App\Form;
 
-use App\Entity\Filter;
+use App\Entity\Event;
 use App\Entity\Resource;
 use App\Entity\Service;
-use App\Entity\Slot;
 use App\Form\Embed\WeekAndTimeType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SlotType extends AbstractType
+class ManagerEventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title', null, [
-                'label' => 'Название',
-                ])
-            ->add('description', null, [
-                'label' => 'Описание',
-            ])
-            ->add('aegaerg', WeekAndTimeType::class, [
-                'mapped'   => false,
-                'required' => 'true',
-                'label'    => 'Повторять',
-                'help'     => 'Если не выбрать то будет один раз',
-            ])
-            ->add('price', null, [
-                'required' => 'false',
-                'label' => 'Цена',
-            ])
             ->add('dateBegin', null, [
-                'widget' => 'single_text',
-                'label' => 'Начало',
-                'required' => 'true',
+                'label' => 'Дата/Время Начала',
+                'widget' => 'single_text'
             ])
             ->add('dateEnd', null, [
-                'widget' => 'single_text',
-                'label' => 'Окончание',
-                'required' => 'true',
+                'label' => 'Дата/Время Окончания',
+                'widget' => 'single_text'
             ])
 
-            ->add('resource', EntityType::class, [
-                'class' => Resource::class,
-                'choice_label' => 'title',
-                'multiple' => true,
-                'label' => 'Место',
-                'required' => 'true',
-            ])
 
             ->add('service', EntityType::class, [
+                'label' => 'Услуга',
                 'class' => Service::class,
                 'choice_label' => 'title',
-                'multiple' => true,
-                'label' => 'Услуга',
-                'required' => 'true',
+                'required'  => true,
             ])
-
+            ->add('resource', EntityType::class, [
+                'label' => 'Место',
+                'class' => Resource::class,
+                'choice_label' => 'title',
+                'required'  => true,
+            ])
+            ->add('comment', null, [
+                'label' => 'Комментарий',
+                'empty_data' => '',
+            ])
             ->add('color', ColorType::class, [
                 'label' => 'Цвет',
                 'empty_data' => '',
             ])
-
             ->add('submit', SubmitType::class, [
                 'label' => 'Создать',
             ])
@@ -77,12 +58,13 @@ class SlotType extends AbstractType
                 'attr' => ['class' => 'btn btn-secondary', 'onclick' => 'dialog.close();']
             ])
         ;
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Slot::class,
+            'data_class' => Event::class,
             'csrf_protection' => false, // Disable CSRF for this specific form
         ]);
     }

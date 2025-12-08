@@ -39,5 +39,44 @@ use Symfony\Component\Validator\Constraints as Assert;
 
     }
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getOrdersCount(): ?int
+    {
+        return $this->ordersCount;
+    }
+
+    public function setOrdersCount(int $ordersCount): static
+    {
+        $this->ordersCount = $ordersCount;
+
+        return $this;
+    }
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
+    public function setProfile(?Profile $profile): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($profile === null && $this->profile !== null) {
+            $this->profile->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($profile !== null && $profile->getUser() !== $this) {
+            $profile->setUser($this);
+        }
+
+        $this->profile = $profile;
+
+        return $this;
+    }
+
 
 }

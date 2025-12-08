@@ -41,11 +41,11 @@ class Slot implements Timestampable, SoftDeleteable
     #[Assert\NotNull]
     private \DateTimeImmutable $dateEnd;
 
-    #[ORM\ManyToOne(targetEntity: Resource::class, inversedBy: 'slots')]
-    private ?Resource $resource;
+    #[ORM\ManyToMany(targetEntity: Resource::class, inversedBy: 'slots')]
+    private Collection $resource;
 
-    #[ORM\ManyToOne(targetEntity: Service::class)]
-    private ?Service $service;
+    #[ORM\ManyToMany(targetEntity: Service::class)]
+    private Collection $service;
 
 
     #[ORM\Column(type: Types::FLOAT, nullable: false)]
@@ -64,7 +64,11 @@ class Slot implements Timestampable, SoftDeleteable
     #[Assert\Regex('/^#[0-9a-f]{6}$/i')]
     private ?string $color;
 
-
+    public function __construct()
+    {
+        $this->resource = new ArrayCollection();
+        $this->service = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -131,36 +135,6 @@ class Slot implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    public function getResource(): ?Resource
-    {
-        return $this->resource;
-    }
-
-    public function setResource(?Resource $resource): static
-    {
-        $this->resource = $resource;
-
-        return $this;
-    }
-
-    public function getService(): ?Service
-    {
-        return $this->service;
-    }
-
-    public function setService(?Service $service): static
-    {
-        $this->service = $service;
-
-        return $this;
-    }
-
-
-    public function __toString():string
-    {
-        return $this->title;
-    }
-
     public function getColor(): ?string
     {
         return $this->color;
@@ -172,5 +146,55 @@ class Slot implements Timestampable, SoftDeleteable
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Resource>
+     */
+    public function getResource(): Collection
+    {
+        return $this->resource;
+    }
+
+    public function addResource(Resource $resource): static
+    {
+        if (!$this->resource->contains($resource)) {
+            $this->resource->add($resource);
+        }
+
+        return $this;
+    }
+
+    public function removeResource(Resource $resource): static
+    {
+        $this->resource->removeElement($resource);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Service>
+     */
+    public function getService(): Collection
+    {
+        return $this->service;
+    }
+
+    public function addService(Service $service): static
+    {
+        if (!$this->service->contains($service)) {
+            $this->service->add($service);
+        }
+
+        return $this;
+    }
+
+    public function removeService(Service $service): static
+    {
+        $this->service->removeElement($service);
+
+        return $this;
+    }
+
+
 
 }

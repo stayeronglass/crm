@@ -71,7 +71,7 @@ class Event implements Timestampable, SoftDeleteable
     #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 10,max: 10,)]
-    #[Assert\Regex('/^#[0-9]{10}$/i')]
+    #[Assert\Regex('/^[0-9]{10}$/i')]
     private ?string $clientPhone;
 
 
@@ -86,11 +86,9 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\Email]
     private ?string $clientEmail;
 
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 1,max: 100,)]
-    private ?string $clientsNumber;
-
+    private ?int $clientsNumber;
 
     public function getId(): ?int
     {
@@ -133,6 +131,66 @@ class Event implements Timestampable, SoftDeleteable
         return $this;
     }
 
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getClientPhone(): ?string
+    {
+        return $this->clientPhone;
+    }
+
+    public function setClientPhone(?string $clientPhone): static
+    {
+        $this->clientPhone = $clientPhone;
+
+        return $this;
+    }
+
+    public function getClientName(): ?string
+    {
+        return $this->clientName;
+    }
+
+    public function setClientName(?string $clientName): static
+    {
+        $this->clientName = $clientName;
+
+        return $this;
+    }
+
+    public function getClientEmail(): ?string
+    {
+        return $this->clientEmail;
+    }
+
+    public function setClientEmail(?string $clientEmail): static
+    {
+        $this->clientEmail = $clientEmail;
+
+        return $this;
+    }
+
+    public function getClientsNumber(): ?string
+    {
+        return $this->clientsNumber;
+    }
+
+    public function setClientsNumber(?string $clientsNumber): static
+    {
+        $this->clientsNumber = $clientsNumber;
+
+        return $this;
+    }
+
     public function getResource(): ?Resource
     {
         return $this->resource;
@@ -165,18 +223,6 @@ class Event implements Timestampable, SoftDeleteable
     public function setSlot(?Slot $slot): static
     {
         $this->slot = $slot;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
-    }
-
-    public function setColor(string $color): static
-    {
-        $this->color = $color;
 
         return $this;
     }
