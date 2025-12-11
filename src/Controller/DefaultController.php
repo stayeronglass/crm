@@ -33,7 +33,6 @@ final class DefaultController extends AbstractController
     #[Route('/', name: 'app_default')]
     public function index(ResourceRepository $repository, EntityManagerInterface $em): Response
     {
-
         return $this->render('default/index.html.twig', [
         ]);
     }

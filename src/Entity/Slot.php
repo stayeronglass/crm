@@ -35,17 +35,26 @@ class Slot implements Timestampable, SoftDeleteable
 
     #[ORM\Column(type: 'datetimetz_immutable')]
     #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\GreaterThan('now', message: 'Дата начала не может быть в прошлом!')]
+    #[Assert\LessThan('next year', message: 'Слишком большая дата начала!')]
     private \DateTimeImmutable $dateBegin;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
     #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\GreaterThan(propertyPath: 'dateBegin', message: 'Дата начала должна быть больше даты кончания!')]
+    #[Assert\GreaterThan('now', message: 'Дата окончания не может быть в прошлом!')]
+    #[Assert\LessThan('next year', message: 'Слишком большая дата окончания!')]
     private \DateTimeImmutable $dateEnd;
 
     #[ORM\ManyToMany(targetEntity: Resource::class, inversedBy: 'slots')]
-    private Collection $resource;
+    private Collection $resources;
 
     #[ORM\ManyToMany(targetEntity: Service::class)]
-    private Collection $service;
+    private Collection $services;
 
 
     #[ORM\Column(type: Types::FLOAT, nullable: false)]
@@ -66,8 +75,8 @@ class Slot implements Timestampable, SoftDeleteable
 
     public function __construct()
     {
-        $this->resource = new ArrayCollection();
-        $this->service = new ArrayCollection();
+        $this->resources = new ArrayCollection();
+        $this->services = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,15 +159,15 @@ class Slot implements Timestampable, SoftDeleteable
     /**
      * @return Collection<int, Resource>
      */
-    public function getResource(): Collection
+    public function getResources(): Collection
     {
-        return $this->resource;
+        return $this->resources;
     }
 
     public function addResource(Resource $resource): static
     {
-        if (!$this->resource->contains($resource)) {
-            $this->resource->add($resource);
+        if (!$this->resources->contains($resource)) {
+            $this->resources->add($resource);
         }
 
         return $this;
@@ -166,7 +175,7 @@ class Slot implements Timestampable, SoftDeleteable
 
     public function removeResource(Resource $resource): static
     {
-        $this->resource->removeElement($resource);
+        $this->resources->removeElement($resource);
 
         return $this;
     }
@@ -174,15 +183,15 @@ class Slot implements Timestampable, SoftDeleteable
     /**
      * @return Collection<int, Service>
      */
-    public function getService(): Collection
+    public function getServices(): Collection
     {
-        return $this->service;
+        return $this->services;
     }
 
     public function addService(Service $service): static
     {
-        if (!$this->service->contains($service)) {
-            $this->service->add($service);
+        if (!$this->services->contains($service)) {
+            $this->services->add($service);
         }
 
         return $this;
@@ -190,10 +199,11 @@ class Slot implements Timestampable, SoftDeleteable
 
     public function removeService(Service $service): static
     {
-        $this->service->removeElement($service);
+        $this->services->removeElement($service);
 
         return $this;
     }
+
 
 
 

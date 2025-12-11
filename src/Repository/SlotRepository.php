@@ -16,29 +16,27 @@ class SlotRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Slot::class);
     }
-    public function getSlots($dateStart, $dateEnd): array
+    public function getSlots(?string $dateStart, ?string $dateEnd): array
     {
 
         $q = $this->createQueryBuilder('slot')
             ->select(
                 'slot'
             )
-            ->from('App\Entity\Slot', 'e')
             ->addOrderBy('slot.id', 'ASC');
 
         if ($dateStart !== null) {
             $dateStart = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateStart);
-            $q->andWhere('e.dateBegin >= :start')
+            $q->andWhere('slot.dateBegin >= :start')
                 ->setParameter('start', $dateStart);
         }
 
         if ($dateEnd !== null) {
             $dateEnd = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateEnd);
-            $q->andWhere('e.dateEnd <= :end')
+            $q->andWhere('slot.dateEnd <= :end')
                 ->setParameter('end', $dateEnd);
 
         }
-
         return $q->getQuery()
             ->getResult();
     }

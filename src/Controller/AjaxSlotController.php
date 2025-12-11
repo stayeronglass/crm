@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Event;
 use App\Entity\Slot;
-use App\Form\EventType;
 use App\Form\SlotType;
 use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,27 +13,31 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class AjaxSlotController extends AbstractController
 {
     #[Route('/ajax/slot', name: 'app_ajax_slot')]
-    public function events(Request $request, SlotRepository $repository): Response
+    public function slots(Request $request, SlotRepository $repository): Response
     {
         $slots = $repository->getSlots($request->get('start'), $request->get('end'));
-
 
         $result = [];
         /** @var Slot $slot */
         foreach ($slots as $slot) {
+            $resourceIds = [];
+            foreach ($slot->getResources() as $resource) {
+                $resourceIds[] = $resource->getId();
+            }
             $result[] = [
-                'id' => $slot->getId(),
-                'title' => $slot->getService()->getTitle() . ': ' . $slot->getDescription(),
-                'start' => $slot->getDateBegin()->format('Y-m-d H:i:s'),
-                'end' => $slot->getDateEnd()->format('Y-m-d H:i:s'),
-                'resourceIds' => [$slot->getResource()->getId()],
+                'id'              => $slot->getId(),
+                'title'           => $slot->getTitle() . ': ' . $slot->getDescription(),
+                'start'           => $slot->getDateBegin()->format('Y-m-d H:i:s'),
+                'end'             => $slot->getDateEnd()->format('Y-m-d H:i:s'),
+                'resourceIds'     => $resourceIds,
                 'backgroundColor' => $slot->getColor(),
-                'display' => 'background',
-                'editable' => false,
+                //'display' => 'background',
+                'editable'        => true,
             ];
         }
 
@@ -57,7 +59,7 @@ final class AjaxSlotController extends AbstractController
             $em->flush();
 
             return new JsonResponse([
-                'success' => true,
+                'success'       => true,
                 'flashMessages' => ['Создано!']
             ]);
         }
@@ -67,20 +69,20 @@ final class AjaxSlotController extends AbstractController
         return new JsonResponse(
             [
                 'success' => false,
-                'type' => 'validation_error',
-                'title' => 'There were validation errors.',
-                'errors' => $errors,
+                'type'    => 'validation_error',
+                'title'   => 'There were validation errors.',
+                'errors'  => $errors,
             ],
             Response::HTTP_BAD_REQUEST // 400 status code
         );
     }
 
+
     private function getErrorsFromForm(FormInterface $form): array
     {
         $errors = [];
         foreach ($form->getErrors(true, false) as $error) {
-            if ($error instanceof FormError)
-            {
+            if ($error instanceof FormError) {
                 $errors[] = $error->getMessage();
             }
         }
@@ -92,5 +94,57 @@ final class AjaxSlotController extends AbstractController
         }
 
         return $errors;
+    }
+
+    #[Route('/ajax/slot/resize', name: 'app_ajax_slot_resize')]
+    public function resize(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    {
+        $slot = $em->getRepository(Slot::class)->find($request->request->get('id'));
+        if (!$slot) return new JsonResponse([
+            'success' => false,
+            'errors'  => ['Нет такого слота!'
+            ]]);
+
+        $begin = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $request->request->get('start'));;
+        if (!$begin) return new JsonResponse([
+            'success' => false,
+            'errors'  => ['Неверная дата начала!'
+            ]]);
+
+        $end = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $request->request->get('end'));;
+        if (!$end) return new JsonResponse([
+            'success' => false,
+            'errors'  => ['Неверная дата окончания!'
+            ]]);
+
+        $slot
+            ->setDateBegin($begin)
+            ->setDateEnd($end)
+        ;
+
+        $errors = $validator->validate($slot);
+
+        if (count($errors) > 0) {
+            $errorsMessage = [];
+            // Handle validation errors (e.g., return a form with errors, or a JSON response)
+            foreach ($errors as $violation) {
+                $message = $violation->getMessage();
+                $errorsMessage[] = $message;
+            }
+            return new JsonResponse([
+                'success' => false,
+                'errors'  => $errorsMessage
+            ]);
+        }
+
+        $em->persist($slot);
+        $em->flush();
+
+        return new JsonResponse(
+            [
+                'success'       => true,
+                'flashMessages' => ['Обновлено!']
+            ]
+        );
     }
 }

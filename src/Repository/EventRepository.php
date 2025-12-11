@@ -27,18 +27,17 @@ class EventRepository extends ServiceEntityRepository
             ->select(
                 'event'
             )
-            ->from('App\Entity\Event', 'e')
             ->addOrderBy('event.id', 'ASC');
 
         if ($dateStart !== null) {
             $dateStart = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateStart);
-            $q->andWhere('e.dateBegin >= :start')
+            $q->andWhere('event.dateBegin >= :start')
                 ->setParameter('start', $dateStart);
         }
 
         if ($dateEnd !== null) {
             $dateEnd = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateEnd);
-            $q->andWhere('e.dateEnd <= :end')
+            $q->andWhere('event.dateEnd <= :end')
                 ->setParameter('end', $dateEnd);
 
         }

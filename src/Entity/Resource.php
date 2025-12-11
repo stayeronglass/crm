@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
 class Resource implements Timestampable, SoftDeleteable
 {
+    const ROOT_NODE_ID = 1;
+
     use TimestampableEntity, SoftDeleteableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -66,7 +68,7 @@ class Resource implements Timestampable, SoftDeleteable
     #[ORM\OrderBy(['lft' => 'ASC'])]
     private Collection $children;
 
-    #[ORM\OneToMany(targetEntity: Slot::class, mappedBy: 'resource', cascade: ['persist'])]
+    #[ORM\ManyToMany(targetEntity: Slot::class, mappedBy: 'resources', cascade: ['persist'])]
     private Collection $slots;
 
     public function __construct()

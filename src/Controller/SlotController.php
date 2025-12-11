@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Event;
 use App\Entity\Resource;
 use App\Entity\Slot;
-use App\Form\EventType;
 use App\Form\SlotType;
 use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
@@ -16,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 #[Route('/slot')]
 #[IsGranted('ROLE_MANAGER')]
 final class SlotController extends AbstractController
@@ -25,20 +24,20 @@ final class SlotController extends AbstractController
     {
         $m = $repository->findBy(['parent' => null]);
 
-        $form = $this->createForm(SlotType::class, new Slot(),[
+        $form = $this->createForm(SlotType::class, new Slot(), [
             'action' => $this->generateUrl('app_slot_add'),
             'method' => 'POST',
         ]);
-
         $res = $em->getRepository(Resource::class)->getResources();
 
         return $this->render('slot/index.html.twig', [
-            'slots' => $slotRepository->findAll(),
-            'form' =>$form,
+            'slots'     => $slotRepository->findAll(),
+            'form'      => $form,
             'resources' => $res,
-            'm' => $m,
+            'm'         => $m,
         ]);
     }
+
     #[Route(name: 'app_slot_add', methods: ['POST'])]
     public function add(Request $request, EntityManagerInterface $em)
     {
@@ -51,29 +50,27 @@ final class SlotController extends AbstractController
         $current = $slot->getDateBegin();
 
         $repeat = !empty($form->get('dayOfWeek')->getData());
-        if ($repeat) $repeatData = array_flip($form->get('dayOfWeek')->getData());
+        if ($repeat) $repeatData = $form->get('dayOfWeek')->getData();
 
-        while ($repeat && $current <= $slot->getDateEnd()){
+        while ($repeat && $current <= $slot->getDateEnd()) {
 
-            $dayOfWeekNumericISO = $current->format('N');
-            if($repeatData[$dayOfWeekNumericISO] ?? false){
+            $dayOfWeekNumericISO = $current->format('l');
+            if ($repeatData[$dayOfWeekNumericISO] ?? false) {
                 $newSlot = clone $slot;
-                dump($repeatData);
-                dd($dayOfWeekNumericISO);
 
-                $newSlot->setDateBegin($current->setTime($slot->getDateBegin()->format('H'),$slot->getDateBegin()->format('i')));
-                $newSlot->setDateEnd($current->setTime($slot->getDateEnd()->format('H'),$slot->getDateEnd()->format('i')));
+                $currentTimeBegin = $repeatData[$dayOfWeekNumericISO . 'TimeBegin'];
+                $currentTimeEnd = $repeatData[$dayOfWeekNumericISO . 'TimeEnd'];
+
+                $newSlot->setDateBegin($current->setTime($currentTimeBegin->format('H'), $currentTimeBegin->format('i')));
+                $newSlot->setDateEnd($current->setTime($currentTimeEnd->format('H'), $currentTimeEnd->format('i')));
 
                 $em->persist($newSlot);
 
             }
 
-
-
             $current = $current->add(new \DateInterval('P1D'));
         }
 
-        dd('???');
         if (!$repeat) $em->persist($slot);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -81,7 +78,7 @@ final class SlotController extends AbstractController
             $em->flush();
 
             return new JsonResponse([
-                'success' => true,
+                'success'       => true,
                 'flashMessages' => ['Создано!']
             ]);
         }
@@ -89,38 +86,42 @@ final class SlotController extends AbstractController
     }
 
 
-
-
-
-
-
-
-    #[Route('/new', name: 'app_slot_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/form_new', name: 'app_slot_form_new', methods: ['GET', 'POST'])]
+    public function form_new(): string
     {
         $slot = new Slot();
         $form = $this->createForm(SlotType::class, $slot);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($slot);
-            $entityManager->flush();
 
-            return $this->redirectToRoute('app_slot_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('slot/new.html.twig', [
-            'slot' => $slot,
+        return $this->renderView('slot/_form_create.html.twig', [
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_slot_show', methods: ['GET'])]
-    public function show(Slot $slot): Response
+    #[Route('/form_edit', name: 'app_slot_form_edit', methods: ['GET', 'POST'])]
+    public function form_edit(SlotRepository $repository, Request $request): Response
     {
-        return $this->render('slot/show.html.twig', [
-            'slot' => $slot,
+        $slot = $repository->find($request->request->get('id'));
+        $form = $this->createForm(SlotType::class, $slot);
+        $form->remove('dayOfWeek');
+
+        $result = $this->renderView('slot/_form_edit.html.twig', [
+            'form' => $form,
         ]);
+
+        return new Response($result, Response::HTTP_OK);
+    }
+
+    #[Route('/form_create', name: 'app_slot_form_create', methods: ['GET', 'POST'])]
+    public function form_create(Request $request): Response
+    {
+        $form = $this->createForm(SlotType::class, new Slot());
+
+        $result = $this->renderView('slot/_form_create.html.twig', [
+            'form' => $form,
+        ]);
+
+        return new Response($result, Response::HTTP_OK);
     }
 
     #[Route('/{id}/edit', name: 'app_slot_edit', methods: ['GET', 'POST'])]
@@ -144,7 +145,7 @@ final class SlotController extends AbstractController
     #[Route('/{id}', name: 'app_slot_delete', methods: ['POST'])]
     public function delete(Request $request, Slot $slot, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$slot->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $slot->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($slot);
             $entityManager->flush();
         }

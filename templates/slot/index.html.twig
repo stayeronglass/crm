@@ -21,11 +21,8 @@
     <br />
     <div id="ec"></div>
 
-    <dialog id="dialog" >
-        <h1>Новый Слот</h1>
-        {{ form(form, {'attr': {'id': 'form_slot'}}) }}
-    </dialog>
-
+<dialog id="dialog" style="width: 80%">
+</dialog>
 
 
     <script type="text/javascript">
@@ -41,19 +38,76 @@
             }
         function showModal(event) {
 
-            //console.log(event)
+            let result = null;
+            $.ajax({
+                url: "{{ path('app_slot_form_create') }}",
+                data: {
+                    id: event.id,
+                },
+                method: "POST",
+                async: false, // This makes the call synchronous
+                success: function(data) {
+                    result = data;
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                }
+            });
+            dialog.innerHTML = result;
 
             document.getElementById('slot_dateBegin').value = event.startStr;
             document.getElementById('slot_dateEnd').value = event.endStr;
 
             document.getElementById('slot_description').value = "";
+            document.getElementById('form_h1').textContent = "Новый слот " + event.start.toLocaleString() + " - " + event.end.toLocaleString();
+
+            const select_all_checkbox = document.getElementById('form_select_all_checkbox');
+            select_all_checkbox.checked = false;
+
+            const time_checkbox = document.querySelectorAll('.time_checkbox'); // Select the div by its class
+            time_checkbox.forEach(time_checkbox_element => {
+                time_checkbox_element.checked = false;
+            });
+
+            containerDiv = document.querySelectorAll('.time_begin'); // Select the div by its class
+            containerDiv.forEach(divElement => {
+                const allInputs = divElement.querySelectorAll('input, select, textarea');
+                allInputs.forEach(inputElement => {
+                    inputElement.disabled = true;
+                    if (inputElement.name.includes("hour")){
+                        inputElement.selectedIndex = event.start.getHours()
+                    }
+                    if (inputElement.name.includes("minute")){
+                        inputElement.selectedIndex = event.start.getMinutes()
+                    }
+                });
+            });
+
+            containerDiv = document.querySelectorAll('.time_end'); // Select the div by its class
+            containerDiv.forEach(divElement => {
+                const allInputs = divElement.querySelectorAll('input, select, textarea');
+
+                allInputs.forEach(inputElement => {
+                    inputElement.disabled = true;
+                    if (inputElement.name.includes("hour")){
+                        inputElement.selectedIndex = event.end.getHours()
+                    }
+                    if (inputElement.name.includes("minute")){
+                        inputElement.selectedIndex = event.end.getMinutes()
+                    }
+                });
+            });
+
 
             const selectElement = document.getElementById("slot_resource");
-            const options = selectElement.getElementsByTagName("option");
+            // const options = selectElement.getElementsByTagName("option");
+            //
+            // if (event.resource) {
+            //     for (let i = 0; i < options.length; i++) {
+            //         options[i].selected = options[i].value === event.resource.id;
+            //     }
+            // }
 
-            for (let i = 0; i < options.length; i++) {
-                options[i].selected = options[i].value === event.resource.id;
-            }
 
 
             dialog.event = event;
@@ -69,6 +123,8 @@
         function getOverlappingEvents(event) {
             // select event has event.resource.id
             // eventDrop event has event.resourceIds
+            if (!event.resource) return false
+
             const rId = event.resource ? event.resource.id : event.resourceIds[0];
             return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && event.start < e.end);
         }
@@ -91,17 +147,72 @@
                     };
                 }
             }],
+            allDaySlot: false,
+            slotMinTime: '09:00:00',
+            slotMaxTime: '23:00:00',
             dayMaxEvents: true,
             nowIndicator: true,
             selectable: true,
             select: function(event) {
-                console.log(event)
-                if (hasOverlappingEvents(event)) {
-                    ec.unselect();
-                    return;
+                if ((event.display === 'background') || (event.editable  === false )){
+                    return false;
                 }
+
                 showModal(event);
             },
+            eventResize : function (info) {
+                if ((info.event.display === 'background') || (info.event.editable  === false )){
+                    return false;
+                }
+                $.ajax({
+                    url: "{{ path('app_ajax_slot_resize') }}",
+                    data: {
+                        id: info.event.id,
+                        start: new Date(info.event.start.getTime() - (info.event.start.getTimezoneOffset() * 60000)).toISOString(),
+                        end: new Date(info.event.end.getTime() - (info.event.end.getTimezoneOffset() * 60000)).toISOString(),
+                    },
+                    method: "POST",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        if (data.success) {
+                            data.flashMessages.forEach(function(flash) {
+                                $.notify(flash, "success");
+                            });
+                        } else {
+                            data.errors.forEach(function(flash) {
+                                $.notify(flash, "error");
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
+            },
+
+            eventClick: function (info) {
+                console.log(info)
+                if ((info.event.display === 'background') || (info.event.editable === false )){
+                    return false;
+                }
+                let result = null;
+                $.ajax({
+                    url: "{{ path('app_slot_form_edit') }}",
+                    data: {
+                        id: info.event.id,
+                    },
+                    method: "POST",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        result = data;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
+                dialog.innerHTML = result;
+                dialog.showModal();
+            }
         });
 
 
@@ -119,7 +230,8 @@
                 }
             });
             console.log(result)
-            return result; // This will now return the data after the synchronous call completes
+            $('#dialog').innerHTML = result
+            dialog.showModal();
         }
 
         function _pad(num) {
@@ -202,6 +314,57 @@
                 ec.refetchEvents();
             });
         })
+
+        function checkAllExceptSelf(selfCheckbox)
+        {
+            const form = selfCheckbox.closest('form');
+            const checkboxes = form.querySelectorAll('.time_checkbox');
+
+            // Iterate through the checkboxes and check them, excluding the selfCheckbox
+            checkboxes.forEach(checkbox => {
+                if (checkbox !== selfCheckbox) {
+                    checkbox.checked = selfCheckbox.checked;
+                    toggleBeginEnd(checkbox)
+                }
+            });
+        }
+
+        function toggleBeginEnd(selfCheckbox)
+        {
+            const tr = selfCheckbox.closest('tr');
+            const allSelects = tr.querySelectorAll('select');
+            allSelects.forEach(input => {
+                if (input !== selfCheckbox) {
+                    input.disabled = !selfCheckbox.checked;
+                }
+            });
+        }
+
+        function popoverButtons(arg) {
+            const $buttons = arg.view.type === 'listWeek' ? $('<div class="mt-2 d-flex"></div>') : $('<div class="mt-2 d-flex justify-content-end border-top pt-2"></div>');
+            let props = arg.event.extendedProps;
+            if (props.hasOwnProperty('type') && props.type === 'event') {
+                $buttons.append(
+                    $('<a class="btn btn-success btn-sm mr-1">').append('<i class="fas fa-fw fa-users">')
+                        .attr('title', 'obj.options.l10n.events.attendees')
+                        .on('click', function (e) {
+                            e.stopPropagation();
+                        })
+                );
+            } else {
+                $buttons.append($('<button class="btn btn-success btn-sm mr-1">').append('<i class="far fa-fw fa-edit">'));
+
+                $buttons.append(
+                    $('<a class="btn btn-danger btn-sm text-white">').append('<i class="far fa-fw fa-trash-alt">')
+                        .attr('title', 'Удалить')
+                        .on('click', function (e) {
+                            e.stopPropagation();
+                        })
+                );
+            }
+
+            return $buttons;
+        }
     </script>
 
 

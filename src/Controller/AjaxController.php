@@ -37,7 +37,7 @@ final class AjaxController extends AbstractController
         foreach ($slots as $slot) {
             $result[] = [
                 'id' => $slot->getId(),
-                'title' => $slot->getService()->getTitle() . ': ' . $slot->getDescription(),
+                'title' => $slot->getTitle(),
                 'start' => $slot->getDateBegin()->format('Y-m-d H:i:s'),
                 'end' => $slot->getDateEnd()->format('Y-m-d H:i:s'),
                 'resourceIds' => [$slot->getResource()->getId()],

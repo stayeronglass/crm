@@ -32,6 +32,7 @@ const events = [{
 function getOverlappingEvents(event) {
     // select event has event.resource.id
     // eventDrop event has event.resourceIds
+    if (!event.resource) return false
     const rId = event.resource ? event.resource.id : event.resourceIds[0];
     return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && event.start < e.end);
 }
