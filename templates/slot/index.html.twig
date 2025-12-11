@@ -143,7 +143,36 @@ console.log(event)
 
                 showModal(event);
             },
-            eventResize : function (info) {
+            eventDrop: function (info) {
+                if ((info.event.display === 'background') || (info.event.editable  === false )){
+                    return false;
+                }
+                $.ajax({
+                    url: "{{ path('app_ajax_slot_resize') }}",
+                    data: {
+                        id: info.event.id,
+                        start: new Date(info.event.start.getTime()).toISOString(),
+                        end: new Date(info.event.end.getTime()).toISOString(),
+                    },
+                    method: "POST",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        if (data.success) {
+                            data.flashMessages.forEach(function(flash) {
+                                $.notify(flash, "success");
+                            });
+                        } else {
+                            data.errors.forEach(function(flash) {
+                                $.notify(flash, "error");
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
+            },
+            eventResize: function (info) {
                 if ((info.event.display === 'background') || (info.event.editable  === false )){
                     return false;
                 }

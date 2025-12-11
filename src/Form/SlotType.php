@@ -104,6 +104,7 @@ class SlotType extends AbstractType
         $resolver->setDefaults([
             'data_class'      => Slot::class,
             'csrf_protection' => false, // Disable CSRF for this specific form
+            'user_timezone'   => 'Europe/Moscow'
         ]);
     }
 }

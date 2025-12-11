@@ -162,6 +162,7 @@ final class AjaxSlotController extends AbstractController
         $em->persist($slot);
         $em->flush();
 
+
         return new JsonResponse(
             [
                 'success'       => true,
