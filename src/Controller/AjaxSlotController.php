@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
 use App\Entity\Slot;
 use App\Form\SlotType;
 use App\Repository\SlotRepository;
@@ -96,6 +97,27 @@ final class AjaxSlotController extends AbstractController
         return $errors;
     }
 
+    #[Route('/ajax/slot/delete', name: 'app_ajax_slot_delete', methods: ['POST'])]
+    public function delete(Request $request, EntityManagerInterface $em): Response
+    {
+        $slot = $em->getRepository(Slot::class)->find($request->request->get('id'));
+        $event = $em->getRepository(Event::class)->findOneBy(['slot' => $slot->getId()]);
+        if (!empty($event)) {
+            return new JsonResponse([
+                'success' => false,
+                'errors'  => ['К слоту уже привязано событие!']
+            ]);
+        }
+        $em->remove($slot);
+        $em->flush();
+
+
+        return new JsonResponse([
+            'success' => true,
+            'flashMessages' => ['Удалено!']
+        ]);
+    }
+
     #[Route('/ajax/slot/resize', name: 'app_ajax_slot_resize')]
     public function resize(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
@@ -145,6 +167,37 @@ final class AjaxSlotController extends AbstractController
                 'success'       => true,
                 'flashMessages' => ['Обновлено!']
             ]
+        );
+    }
+
+    #[Route('/ajax/slot/{id}/edit', name: 'app_ajax_slot_edit')]
+    public function edit(Request $request, Slot $slot, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(SlotType::class, $slot);
+        $form->remove('dayOfWeek');
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($slot);
+            $em->flush();
+
+            return new JsonResponse([
+                'success'       => true,
+                'flashMessages' => ['Обновлено!']
+            ]);
+        }
+
+        $errors = $this->getErrorsFromForm($form); // Call the helper method
+
+        return new JsonResponse(
+            [
+                'success' => false,
+                'type'    => 'validation_error',
+                'title'   => 'There were validation errors.',
+                'errors'  => $errors,
+            ],
+            Response::HTTP_BAD_REQUEST // 400 status code
         );
     }
 }

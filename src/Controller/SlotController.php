@@ -20,21 +20,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class SlotController extends AbstractController
 {
     #[Route(name: 'app_slot_index', methods: ['GET'])]
-    public function index(ResourceRepository $repository, SlotRepository $slotRepository, EntityManagerInterface $em): Response
+    public function index(ResourceRepository $repository,): Response
     {
-        $m = $repository->findBy(['parent' => null]);
 
-        $form = $this->createForm(SlotType::class, new Slot(), [
-            'action' => $this->generateUrl('app_slot_add'),
-            'method' => 'POST',
-        ]);
-        $res = $em->getRepository(Resource::class)->getResources();
+        $root = $repository->find(1);
+        $res  = $repository->getLeafsQuery($root)->getArrayResult();
 
         return $this->render('slot/index.html.twig', [
-            'slots'     => $slotRepository->findAll(),
-            'form'      => $form,
             'resources' => $res,
-            'm'         => $m,
         ]);
     }
 
@@ -102,7 +95,10 @@ final class SlotController extends AbstractController
     public function form_edit(SlotRepository $repository, Request $request): Response
     {
         $slot = $repository->find($request->request->get('id'));
-        $form = $this->createForm(SlotType::class, $slot);
+        $form = $this->createForm(SlotType::class, $slot, [
+            'action' => $this->generateUrl('app_ajax_slot_edit', ['id' => $slot->getId()]),
+            'method' => 'POST',
+        ]);
         $form->remove('dayOfWeek');
 
         $result = $this->renderView('slot/_form_edit.html.twig', [
@@ -115,7 +111,11 @@ final class SlotController extends AbstractController
     #[Route('/form_create', name: 'app_slot_form_create', methods: ['GET', 'POST'])]
     public function form_create(Request $request): Response
     {
-        $form = $this->createForm(SlotType::class, new Slot());
+        $form = $this->createForm(SlotType::class, new Slot(), [
+            'action' => $this->generateUrl('app_ajax_slot_add'),
+            'method' => 'POST',
+        ])
+        ;
 
         $result = $this->renderView('slot/_form_create.html.twig', [
             'form' => $form,
@@ -124,32 +124,7 @@ final class SlotController extends AbstractController
         return new Response($result, Response::HTTP_OK);
     }
 
-    #[Route('/{id}/edit', name: 'app_slot_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Slot $slot, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(SlotType::class, $slot);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
 
-            return $this->redirectToRoute('app_slot_index', [], Response::HTTP_SEE_OTHER);
-        }
 
-        return $this->render('slot/edit.html.twig', [
-            'slot' => $slot,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_slot_delete', methods: ['POST'])]
-    public function delete(Request $request, Slot $slot, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $slot->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($slot);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_slot_index', [], Response::HTTP_SEE_OTHER);
-    }
 }

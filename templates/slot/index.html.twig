@@ -11,8 +11,8 @@
     <br />
 
     <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
-    {% for i in m %}
-        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ i.id }}" href="javascript:void(0);">{{ i.title }}</a>
+    {% for key, value in resources %}
+        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ value.id }}" href="javascript:void(0);">{{ value.title }}</a>
     {% endfor %}
 
     <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
@@ -37,7 +37,7 @@
                 return now;
             }
         function showModal(event) {
-
+console.log(event)
             let result = null;
             $.ajax({
                 url: "{{ path('app_slot_form_create') }}",
@@ -98,35 +98,18 @@
                 });
             });
 
-
-            const selectElement = document.getElementById("slot_resource");
-            // const options = selectElement.getElementsByTagName("option");
-            //
-            // if (event.resource) {
-            //     for (let i = 0; i < options.length; i++) {
-            //         options[i].selected = options[i].value === event.resource.id;
-            //     }
-            // }
+            if (event.resource) {
+                const selectElement = document.getElementById("slot_resources");
+                const options = selectElement.getElementsByTagName("option");
+                    for (let i = 0; i < options.length; i++) {
+                        options[i].selected = options[i].value === event.resource.id;
+                    }
+            }
 
 
 
             dialog.event = event;
             dialog.showModal();
-        }
-
-        function hasOverlappingEvents(event) {
-            return getOverlappingEvents(event).length > 0;
-        }
-        function hasOtherOverlappingEvents(event) {
-            return getOverlappingEvents(event).filter(e => e.id != event.id).length > 0
-        }
-        function getOverlappingEvents(event) {
-            // select event has event.resource.id
-            // eventDrop event has event.resourceIds
-            if (!event.resource) return false
-
-            const rId = event.resource ? event.resource.id : event.resourceIds[0];
-            return ec.getEvents().filter(e => e.resourceIds[0] == rId && e.start < event.end && event.start < e.end);
         }
 
         const ec = EventCalendar.create(document.getElementById('ec'), {
@@ -211,28 +194,12 @@
                     }
                 });
                 dialog.innerHTML = result;
+
+                document.getElementById('form_h1').textContent = "Редактировать слот " + info.event.start.toLocaleString() + " - " + info.event.end.toLocaleString();
+
                 dialog.showModal();
             }
         });
-
-
-        async  function getResources() {
-            let result = null;
-            $.ajax({
-                url: "{{ path('app_ajax_resources') }}",
-                method: "GET",
-                async: false, // This makes the call synchronous
-                success: function(data) {
-                    result = data;
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error:", error);
-                }
-            });
-            console.log(result)
-            $('#dialog').innerHTML = result
-            dialog.showModal();
-        }
 
         function _pad(num) {
             let norm = Math.floor(Math.abs(num));
@@ -240,44 +207,38 @@
         }
 
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('[name="event"]');
+        function create_slot(button) {
+            const form = document.querySelector('[name="slot"]');
+            const formData = new FormData(form); // Or serialize to JSON
 
-            if (form) {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Prevent default form submission
-
-                    const formData = new FormData(form); // Or serialize to JSON
-
-                    fetch(form.action, {
-                        method: form.method,
-                        body: formData, // Or JSON.stringify(Object.fromEntries(formData))
-                        headers: {
-                            'Accept': 'application/json' // Expecting JSON response
-                        }
-                    })
-                        .then(response => response.json()) // Parse JSON response
-                        .then(data => {
-                            if (data.success) {
-                                data.flashMessages.forEach(function(flash) {
-                                    // Create and append a div for the flash message
-                                    $.notify(flash, "success");
-                                });
-                            } else {
-                                Object.keys(data.errors).forEach(key => {
-                                    console.log(data.errors)
-                                    $.notify(data.errors[key][0],"error");
-                                });
-                            }
-                            dialog.close();
-                            ec.refetchEvents();
-                        })
-                        .catch(error => {
-                            console.error('Network error or server issue:', error);
+            fetch(form.action, {
+                method: form.method,
+                body: formData, // Or JSON.stringify(Object.fromEntries(formData))
+                headers: {
+                    'Accept': 'application/json' // Expecting JSON response
+                }
+            })
+                .then(response => response.json()) // Parse JSON response
+                .then(data => {
+                    if (data.success) {
+                        data.flashMessages.forEach(function (flash) {
+                            // Create and append a div for the flash message
+                            $.notify(flash, "success");
                         });
+                    } else {
+                        Object.keys(data.errors).forEach(key => {
+                            console.log(data.errors)
+                            $.notify(data.errors[key][0], "error");
+                        });
+                    }
+                    dialog.close();
+                    ec.refetchEvents();
+                })
+                .catch(error => {
+                    console.error('Network error or server issue:', error);
                 });
-            }
-        });
+            return true;
+        }
 
         function getStaffMembers(elem){
 
@@ -364,6 +325,34 @@
             }
 
             return $buttons;
+        }
+
+        function deleteSlot(id)
+        {
+            $.ajax({
+                url: "{{ path('app_ajax_slot_delete') }}",
+                data: {
+                    id: id
+                },
+                method: "POST",
+                async: false, // This makes the call synchronous
+                success: function(data) {
+                    if (data.success) {
+                        data.flashMessages.forEach(function(flash) {
+                            $.notify(flash, "success");
+                        });
+                    } else {
+                        data.errors.forEach(function(flash) {
+                            $.notify(flash, "error");
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                }
+            });
+
+            dialog.close();
         }
     </script>
 

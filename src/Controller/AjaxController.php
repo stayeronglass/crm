@@ -16,8 +16,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use function Symfony\Component\Clock\now;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 final class AjaxController extends AbstractController
 {
     #[Route('/ajax/resources', name: 'app_ajax_resources')]
@@ -30,18 +31,24 @@ final class AjaxController extends AbstractController
     public function events(Request $request, EventRepository $repository, SlotRepository $slotRepository): Response
     {
         $events = $repository->getEvents($request->get('start'), $request->get('end'));
-        $slots = $slotRepository->getSlots($request->get('start'), $request->get('end'));
+        $slots  = $slotRepository->getSlots($request->get('start'), $request->get('end'));
         $result = [];
 
         /** @var Slot $slot */
         foreach ($slots as $slot) {
+            $resourceIds = [];
+            foreach ($slot->getResources() as $resource) {
+                $resourceIds[] = $resource->getId();
+            }
             $result[] = [
-                'id' => $slot->getId(),
-                'title' => $slot->getTitle(),
-                'start' => $slot->getDateBegin()->format('Y-m-d H:i:s'),
-                'end' => $slot->getDateEnd()->format('Y-m-d H:i:s'),
-                'resourceIds' => [$slot->getResource()->getId()],
+                'id'              => $slot->getId(),
+                'title'           => $slot->getTitle(),
+                'start'           => $slot->getDateBegin()->format('Y-m-d H:i:s'),
+                'end'             => $slot->getDateEnd()->format('Y-m-d H:i:s'),
+                'resourceIds'     => $resourceIds,
                 'backgroundColor' => $slot->getColor(),
+                'editable'        => false,
+                'display'         => 'background',
             ];
         }
 
@@ -49,12 +56,13 @@ final class AjaxController extends AbstractController
         /** @var Event $event */
         foreach ($events as $event) {
             $result[] = [
-                'id' => $event->getId(),
-                'title' => $event->getService()->getTitle() . ': ' . $event->getComment(),
-                'start' => $event->getDateBegin()->format('Y-m-d H:i:s'),
-                'end' => $event->getDateEnd()->format('Y-m-d H:i:s'),
-                'resourceIds' => [$event->getResource()->getId()],
+                'id'              => $event->getId(),
+                'title'           => $event->getService()->getTitle() . ': ' . $event->getComment(),
+                'start'           => $event->getDateBegin()->format('Y-m-d H:i:s'),
+                'end'             => $event->getDateEnd()->format('Y-m-d H:i:s'),
+                'resourceIds'     => [$event->getResource()->getId()],
                 'backgroundColor' => $event->getColor(),
+                'editable'        => true,
             ];
         }
 
@@ -76,7 +84,7 @@ final class AjaxController extends AbstractController
             $em->flush();
 
             return new JsonResponse([
-                'success' => true,
+                'success'       => true,
                 'flashMessages' => ['Создано!']
             ]);
         }
@@ -86,9 +94,9 @@ final class AjaxController extends AbstractController
         return new JsonResponse(
             [
                 'success' => false,
-                'type' => 'validation_error',
-                'title' => 'There were validation errors.',
-                'errors' => $errors,
+                'type'    => 'validation_error',
+                'title'   => 'There were validation errors.',
+                'errors'  => $errors,
             ],
             Response::HTTP_BAD_REQUEST // 400 status code
         );
@@ -98,8 +106,7 @@ final class AjaxController extends AbstractController
     {
         $errors = [];
         foreach ($form->getErrors(true, false) as $error) {
-            if ($error instanceof FormError)
-            {
+            if ($error instanceof FormError) {
                 $errors[] = $error->getMessage();
             }
         }
