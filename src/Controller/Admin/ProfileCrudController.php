@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Profile;
+use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -14,6 +16,8 @@ class ProfileCrudController extends AbstractCrudController
     {
         return Profile::class;
     }
+
+
 
     public function configureFields(string $pageName): iterable
     {

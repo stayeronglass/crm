@@ -19,6 +19,7 @@
 
     <br />
     <br />
+
     <div id="ec"></div>
 
 <dialog id="dialog" style="width: 80%">
@@ -113,14 +114,37 @@ console.log(event)
         }
 
         const ec = EventCalendar.create(document.getElementById('ec'), {
+            allDaySlot: true,
+            slotMinTime: '09:00:00',
+            slotMaxTime: '23:00:00',
+            scrollTime: '09:00:00',
+            dayMaxEvents: true,
+            nowIndicator: true,
+            selectable: true,
+            unselectAuto :false,
+            resources: resources,
+            buttonText: {
+                resourceTimeGridDay: "день",
+                resourceTimeGridWeek: "неделя",
+                dayGridMonth: "месяц",
+                resourceTimelineWeek: "неделя вертикально",
+                today: "сегодня"
+            },
+            views: {
+                timeGridWeek: {pointer: true},
+                resourceTimeGridWeek: {
+                    pointer: true
+                },
+                timeGridDay: {pointer: true},
+            },
             view: 'resourceTimeGridDay',
             headerToolbar: {
                 start: 'prev,next today',
                 center: 'title',
-                end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek resourceTimeGridWeek,resourceTimelineWeek'
+                end: 'dayGridMonth,resourceTimeGridWeek,resourceTimeGridDay,resourceTimelineWeek'
             },
-            resources: resources,
-            scrollTime: '09:00:00',
+
+
             eventSources: [{
                 url: '{{ path('app_ajax_slot') }}',
                 method: 'POST',
@@ -130,12 +154,7 @@ console.log(event)
                     };
                 }
             }],
-            allDaySlot: false,
-            slotMinTime: '09:00:00',
-            slotMaxTime: '23:00:00',
-            dayMaxEvents: true,
-            nowIndicator: true,
-            selectable: true,
+
             select: function(event) {
                 if ((event.display === 'background') || (event.editable  === false )){
                     return false;
@@ -389,26 +408,12 @@ console.log(event)
 {% endblock %}
 
     {% block javascripts %}
-        <script src="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.7.1/dist/event-calendar.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@event-calendar/build@5.0.2/dist/event-calendar.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/dayjs.min.js"></script>
     {% endblock %}
 
     {% block stylesheets %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.7.1/dist/event-calendar.min.css">
-
-        <style>
-            .ec-timeline .ec-time, .ec-timeline .ec-line {
-                width: 16px;
-            }
-            .ec-timeline .ec-time {
-                overflow: visible;
-            }
-            .ec-timeline .ec-time time {
-                display: inline-block;
-                width: 64px;
-                text-align: center;
-            }
-        </style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@event-calendar/build@5.0.2/dist/event-calendar.min.css">
     {% endblock %}
 
 

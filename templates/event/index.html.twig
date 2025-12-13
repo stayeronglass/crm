@@ -80,7 +80,22 @@
         }
 
         const ec = EventCalendar.create(document.getElementById('ec'), {
-            view: 'resourceTimeGridDay',
+            unselectAuto :false,
+            resources: resources,
+            scrollTime: '09:00:00',
+            allDaySlot: false,
+            slotMinTime: '09:00:00',
+            slotMaxTime: '23:00:00',
+            nowIndicator: true,
+            selectable: true,
+            //slotLabelInterval:'00:30:00',
+            views: {
+                timeGridWeek: {pointer: true},
+                resourceTimeGridWeek: {
+                    pointer: true
+                },
+                timeGridDay: {pointer: true},
+            },
             headerToolbar: {
                 start: 'prev,next today',
                 center: 'title',
@@ -102,10 +117,7 @@
                     html: info.resource.title
                 }
             },
-            unselectAuto :true,
-            resources: resources,
-            scrollTime: '09:00:00',
-            //slotLabelInterval:'00:30:00',
+
             eventSources: [{
                 url: '{{ path('app_ajax_events') }}',
                 method: 'POST',
@@ -115,24 +127,31 @@
                     };
                 }
             }],
-            allDaySlot: false,
-            slotMinTime: '09:00:00',
-            slotMaxTime: '23:00:00',
-            nowIndicator: true,
-            selectable: true,
+
             select: function(event) {
                 console.log(event)
-                if (hasOverlappingEvents(event)) {
-                    $.notify("Нельзя делать пересекающиеся события", "error");
-                    ec.unselect();
-                    return;
+                if ((event.display === 'background') || (event.editable  === false )){
+                    return false;
                 }
+                // if (hasOverlappingEvents(event)) {
+                //     $.notify("Нельзя делать пересекающиеся события", "error");
+                //     ec.unselect();
+                //     return;
+                // }
                 showModal(event);
             },
             eventResize: function ({ event, revert }) {
-                if (hasOtherOverlappingEvents(event)){
-                    $.notify("Нельзя делать пересекающиеся события", "error");
-                    revert();
+                if ((event.display === 'background') || (event.editable  === false )){
+                    return false;
+                }
+                // if (hasOtherOverlappingEvents(event)){
+                //     $.notify("Нельзя делать пересекающиеся события", "error");
+                //     revert();
+                // }
+            },
+            eventDrop: function (info) {
+                if ((info.event.display === 'background') || (info.event.editable  === false )){
+                    return false;
                 }
             },
         });

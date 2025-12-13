@@ -3,9 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Service;
+use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -30,6 +32,17 @@ class ServiceCrudController extends AbstractCrudController
 
         return $queryBuilder;
     }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            //self::PAGE_DETAIL, self::PAGE_EDIT, self::PAGE_INDEX, self::PAGE_NEW
+            ->setPageTitle(Crud::PAGE_INDEX, 'Chalet CRM | Услуги')
+            ->setPageTitle(Crud::PAGE_DETAIL, fn (Service  $service) => sprintf('Chalet CRM | Услуга: %s', $service->getTitle()))
+            ->setPageTitle(Crud::PAGE_EDIT, fn (Service  $service) => sprintf('Chalet CRM | Редактирование услуги: %s', $service->getTitle()))
+        ;
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm()

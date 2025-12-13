@@ -3,9 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Slot;
+use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -33,6 +35,16 @@ class SlotCrudController extends AbstractCrudController
         ;
 
         return $queryBuilder;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            //self::PAGE_DETAIL, self::PAGE_EDIT, self::PAGE_INDEX, self::PAGE_NEW
+            ->setPageTitle(Crud::PAGE_INDEX, 'Chalet CRM | Слоты')
+            ->setPageTitle(Crud::PAGE_DETAIL, fn (Slot $slot) => sprintf('Chalet CRM | Слот: %s', $slot->getTitle()))
+            ->setPageTitle(Crud::PAGE_EDIT, fn (Slot $slot) => sprintf('Chalet CRM | Редактирование слота: %s', $slot->getTitle()))
+        ;
     }
 
     public function configureFields(string $pageName): iterable

@@ -87,9 +87,8 @@ class UserCrudController extends AbstractCrudController
         ;
         yield FormField::addTab('Профиль', 'fas fa-cog') // Tab 2
         ->setIcon('phone')->addCssClass('optional')
-            ->setHelp('Профиль')
         ;
-        AssociationField::new('profile')
+        yield AssociationField::new('profile')
             ->setCrudController(ProfileCrudController::class)
             ->renderAsEmbeddedForm()
         ;
