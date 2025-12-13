@@ -6,13 +6,13 @@ use App\Entity\Event;
 use App\Entity\Resource;
 use App\Entity\Service;
 use App\Entity\Slot;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
@@ -44,9 +44,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Мастерские', 'fa fa-tags', Resource::class);
         yield MenuItem::linkToCrud('Услуги', 'fa fa-tags', Service::class);
         yield MenuItem::linkToCrud('Слоты', 'fa fa-tags', Slot::class);
-        yield MenuItem::linkToCrud('Записи', 'fa fa-tags', Event::class);
+        yield MenuItem::linkToCrud('Записи', 'fa fa-clock', Event::class);
+        yield MenuItem::linkToCrud('Пользователи', 'fa fa-user', User::class);
 
         yield MenuItem::section('Служебные', 'admin');
-        yield MenuItem::linkToLogout('Выход', 'fa fa-exit');
+        yield MenuItem::linkToLogout('Выход', 'fa fa-sign-out');
     }
 }

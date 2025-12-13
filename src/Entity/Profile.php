@@ -55,13 +55,13 @@ class Profile implements Timestampable, SoftDeleteable
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max:2)]
-    private string $locale;
+    private string $locale = 'ru';
 
     #[ORM\Column(type: Types::STRING,  length: 3, nullable: true)]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max:3)]
-    private string $currency;
+    private string $currency = 'RUR';
 
     public function getId(): ?int
     {

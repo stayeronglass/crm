@@ -28,11 +28,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     #[ORM\OneToOne(targetEntity: Profile::class, mappedBy: 'user', cascade: ['persist'])]
     private ?Profile $profile = null;
 
-    #[ORM\Column]
-    #[Assert\NotNull]
-    #[Assert\GreaterThanOrEqual(0)]
-    private int $ordersCount = 0;
-
     public function __construct()
     {
         parent::__construct();
@@ -44,17 +39,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         return $this->id;
     }
 
-    public function getOrdersCount(): ?int
-    {
-        return $this->ordersCount;
-    }
-
-    public function setOrdersCount(int $ordersCount): static
-    {
-        $this->ordersCount = $ordersCount;
-
-        return $this;
-    }
 
     public function getProfile(): ?Profile
     {
