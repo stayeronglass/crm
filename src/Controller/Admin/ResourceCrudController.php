@@ -34,7 +34,9 @@ class ResourceCrudController extends AbstractCrudController
     }
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')->hideOnForm();
+        yield IdField::new('id')->hideOnForm()
+            ->setTemplatePath('admin/field/id_link.html.twig')
+        ;
         yield TextField::new('title');
         yield TextEditorField::new('description');
 

@@ -62,5 +62,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         return $this;
     }
 
-
+    public function __toString():string
+    {
+        return $this->username;
+    }
 }

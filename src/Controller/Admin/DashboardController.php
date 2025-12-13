@@ -33,6 +33,9 @@ class DashboardController extends AbstractDashboardController
     {
          return Crud::new()
             ->setDateTimeFormat('dd.MM.yyyy HH:mm')
+             //self::PAGE_DETAIL, self::PAGE_EDIT, self::PAGE_INDEX, self::PAGE_NEW
+            //->setPageTitle(Crud::PAGE_INDEX, 'Chalet CRM | Dashboard')
+            //->setPageTitle(Crud::PAGE_DETAIL, 'Chalet CRM | View Item')
          ;
     }
 

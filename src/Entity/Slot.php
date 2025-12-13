@@ -205,6 +205,9 @@ class Slot implements Timestampable, SoftDeleteable
     }
 
 
-
+    public function __toString():string
+    {
+        return $this->title;
+    }
 
 }
