@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Entity\Slot;
 use App\Form\EventType;
+use App\Form\SlotType;
 use App\Repository\EventRepository;
 use App\Repository\ResourceRepository;
 use App\Repository\SlotRepository;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_USER')]
 final class AjaxController extends AbstractController
@@ -102,6 +104,109 @@ final class AjaxController extends AbstractController
         );
     }
 
+    #[Route('/ajax/event/delete', name: 'app_ajax_event_delete', methods: ['POST'])]
+    public function delete(Request $request, EntityManagerInterface $em): Response
+    {
+        $event = $em->getRepository(Event::class)->findOneBy(['slot' => $request->request->get('id')]);
+        if (empty($event)) {
+            return new JsonResponse([
+                'success' => false,
+                'errors'  => ['Событие не найдено!']
+            ]);
+        }
+        $em->remove($event);
+        $em->flush();
+
+
+        return new JsonResponse([
+            'success' => true,
+            'flashMessages' => ['Удалено!']
+        ]);
+    }
+
+    #[Route('/ajax/event/resize', name: 'app_ajax_event_resize')]
+    public function resize(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    {
+        $event = $em->getRepository(Event::class)->find($request->request->get('id'));
+        if (!$event) return new JsonResponse([
+            'success' => false,
+            'errors'  => ['Событие не найдено!'
+            ]]);
+
+        $begin = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $request->request->get('start'));;
+        if (!$begin) return new JsonResponse([
+            'success' => false,
+            'errors'  => ['Неверная дата начала!'
+            ]]);
+
+        $end = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $request->request->get('end'));;
+        if (!$end) return new JsonResponse([
+            'success' => false,
+            'errors'  => ['Неверная дата окончания!'
+            ]]);
+
+        $event
+            ->setDateBegin($begin)
+            ->setDateEnd($end)
+        ;
+
+        $errors = $validator->validate($event);
+
+        if (count($errors) > 0) {
+            $errorsMessage = [];
+            // Handle validation errors (e.g., return a form with errors, or a JSON response)
+            foreach ($errors as $violation) {
+                $message = $violation->getMessage();
+                $errorsMessage[] = $message;
+            }
+            return new JsonResponse([
+                'success' => false,
+                'errors'  => $errorsMessage
+            ]);
+        }
+
+        $em->persist($event);
+        $em->flush();
+
+
+        return new JsonResponse(
+            [
+                'success'       => true,
+                'flashMessages' => ['Обновлено!']
+            ]
+        );
+    }
+
+
+    #[Route('/ajax/event/{id}/edit', name: 'app_ajax_event_edit')]
+    public function edit(Request $request, Event $event, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(EventType::class, $event);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($event);
+            $em->flush();
+
+            return new JsonResponse([
+                'success'       => true,
+                'flashMessages' => ['Обновлено!']
+            ]);
+        }
+
+        $errors = $this->getErrorsFromForm($form); // Call the helper method
+
+        return new JsonResponse(
+            [
+                'success' => false,
+                'type'    => 'validation_error',
+                'title'   => 'There were validation errors.',
+                'errors'  => $errors,
+            ],
+            Response::HTTP_BAD_REQUEST // 400 status code
+        );
+    }
     private function getErrorsFromForm(FormInterface $form): array
     {
         $errors = [];

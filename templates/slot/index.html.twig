@@ -3,16 +3,17 @@
 {% block title %}Слоты{% endblock %}
 
 {% block body %}
-    <div class="alert  alert-dismissible fade" role="alert" id="ajaxMessage" style="display: none;">
-        <span id="messageContent">111</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <br />
-    <br />
 
     <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
     {% for key, value in resources %}
-        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ value.id }}" href="javascript:void(0);">{{ value.title }}</a>
+        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ value.id }}" href="javascript:void(0);"
+           {% if value.color %}
+            style="background-color: {{ value.color }}"
+            {% endif %}
+        >
+
+            {{ value.title }}
+        </a>
     {% endfor %}
 
     <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
@@ -107,8 +108,6 @@ console.log(event)
                     }
             }
 
-
-
             dialog.event = event;
             dialog.showModal();
         }
@@ -144,7 +143,17 @@ console.log(event)
                 end: 'dayGridMonth,resourceTimeGridWeek,resourceTimeGridDay,resourceTimelineWeek'
             },
 
+            titleFormat : function(start, end) {
+                const options = {
+                    weekday: 'long', // Full day of the week (e.g., 'понедельник')
+                    month: 'long',   // Full month name (e.g., 'ноябрь')
+                    day: 'numeric',  // Day of the month (e.g., '23')
+                };
 
+                const s = new Intl.DateTimeFormat('ru-RU', options).format(start);
+
+                return {html: s};
+            },
             eventSources: [{
                 url: '{{ path('app_ajax_slot') }}',
                 method: 'POST',

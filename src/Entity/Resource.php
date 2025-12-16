@@ -36,6 +36,11 @@ class Resource implements Timestampable, SoftDeleteable
     #[Assert\NotBlank]
     private ?string $description;
 
+    #[ORM\Column(type: Types::STRING, length: 7, nullable: false)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 7,max: 7,)]
+    #[Assert\Regex('/^#[0-9a-f]{6}$/i')]
+    private ?string $color;
 
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
@@ -230,5 +235,17 @@ class Resource implements Timestampable, SoftDeleteable
     public function __toString():string
     {
         return $this->title;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
     }
 }

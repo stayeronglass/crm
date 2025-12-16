@@ -94,7 +94,7 @@ class SlotType extends AbstractType
             }
             $form->add('cancel', ButtonType::class, [
                 'label' => 'Закрыть',
-                'attr'  => ['class' => 'btn btn-primary', 'onclick' => 'dialog.close();']
+                'attr'  => ['class' => 'btn btn-primary', 'onclick' => 'ec.unselect();dialog.close();']
             ]);
         });;
     }

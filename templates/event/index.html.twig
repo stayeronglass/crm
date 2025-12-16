@@ -3,24 +3,19 @@
 {% block title %}Записи{% endblock %}
 
 {% block body %}
-    <style>
-        .ec-header .ec-day {
-            height: auto;
-            overflow:auto;
-            font-weight: bold;
-        }
-    </style>
-    <div class="alert  alert-dismissible fade" role="alert" id="ajaxMessage" style="display: none;">
-        <span id="messageContent">111</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div class="d-flex gap-2 justify-content-center py-5">
-        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
-        {% for i in m %}
-            <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ i.id }}" href="javascript:void(0);">{{ i.title }}</a>
-        {% endfor %}
-        <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
-    </div>
+    <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="0" href="javascript:void(0);">Все</a>
+    {% for key, value in resources %}
+        <a class="btn btn-primary bookly-js-staff-pills" data-staff_id="{{ value.id }}" href="javascript:void(0);"
+            {% if value.color %}
+                style="background-color: {{ value.color }}"
+            {% endif %}
+        >
+
+            {{ value.title }}
+        </a>
+    {% endfor %}
+
+    <a class="btn btn-primary" data-staff_id="0" href="javascript:void(0);" onclick="ec.refetchEvents();">Обновить</a>
 
 
     <br />
@@ -28,7 +23,7 @@
     <div id="ec"></div>
 
     <dialog id="dialog" >
-        <h1>Новая Запись</h1>
+        <h1 id="form_h1">Новая Запись</h1>
         {{ form(form, {'attr': {'id': 'form_event'}}) }}
     </dialog>
 
@@ -52,7 +47,7 @@
             document.getElementById('event_dateBegin').value = event.startStr;
             document.getElementById('event_dateEnd').value = event.endStr;
 
-            document.getElementById('event_comment').value = "";
+            //document.getElementById('event_comment').value = event.comment;
 
             const selectElement = document.getElementById("event_resource");
             const options = selectElement.getElementsByTagName("option");
@@ -96,10 +91,19 @@
                 },
                 timeGridDay: {pointer: true},
             },
+            view: 'resourceTimeGridDay',
+            buttonText: {
+                resourceTimeGridDay: "день",
+                listWeek: "неделя списком",
+                resourceTimeGridWeek: "неделя",
+                resourceTimelineMonth : "месяц",
+                resourceTimelineWeek: "неделя вертикально",
+                today: "сегодня"
+            },
             headerToolbar: {
                 start: 'prev,next today',
                 center: 'title',
-                end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                end: 'resourceTimelineMonth ,resourceTimeGridWeek,resourceTimeGridDay,resourceTimelineWeek'
             },
             titleFormat : function(start, end) {
                 const options = {
@@ -133,27 +137,76 @@
                 if ((event.display === 'background') || (event.editable  === false )){
                     return false;
                 }
-                // if (hasOverlappingEvents(event)) {
-                //     $.notify("Нельзя делать пересекающиеся события", "error");
-                //     ec.unselect();
-                //     return;
-                // }
+                document.getElementById('form_h1').textContent = "Новое событие";
                 showModal(event);
             },
-            eventResize: function ({ event, revert }) {
-                if ((event.display === 'background') || (event.editable  === false )){
+            eventResize: function (info) {
+                if ((info.event.display === 'background') || (info.event.editable  === false )){
                     return false;
                 }
-                // if (hasOtherOverlappingEvents(event)){
-                //     $.notify("Нельзя делать пересекающиеся события", "error");
-                //     revert();
-                // }
+                $.ajax({
+                    url: "{{ path('app_ajax_event_resize') }}",
+                    data: {
+                        id: info.event.id,
+                        start: new Date(info.event.start.getTime() - (info.event.start.getTimezoneOffset() * 60000)).toISOString(),
+                        end: new Date(info.event.end.getTime() - (info.event.end.getTimezoneOffset() * 60000)).toISOString(),
+                    },
+                    method: "POST",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        if (data.success) {
+                            data.flashMessages.forEach(function(flash) {
+                                $.notify(flash, "success");
+                            });
+                        } else {
+                            data.errors.forEach(function(flash) {
+                                $.notify(flash, "error");
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
             },
             eventDrop: function (info) {
                 if ((info.event.display === 'background') || (info.event.editable  === false )){
                     return false;
                 }
+                $.ajax({
+                    url: "{{ path('app_ajax_event_resize') }}",
+                    data: {
+                        id: info.event.id,
+                        start: new Date(info.event.start.getTime()).toISOString(),
+                        end: new Date(info.event.end.getTime()).toISOString(),
+                    },
+                    method: "POST",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        if (data.success) {
+                            data.flashMessages.forEach(function(flash) {
+                                $.notify(flash, "success");
+                            });
+                        } else {
+                            data.errors.forEach(function(flash) {
+                                $.notify(flash, "error");
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
             },
+            eventClick: function (info) {
+                console.log(info)
+                if ((info.event.display === 'background') || (info.event.editable === false )){
+                    return false;
+                }
+                document.getElementById('form_h1').textContent = "Редактировать событие " + info.event.start.toLocaleString() + " - " + info.event.end.toLocaleString();
+
+                showModal(info.event);
+            }
         });
 
 
@@ -263,25 +316,11 @@
 
 {% endblock %}
 
-    {% block javascripts %}
-        <script src="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.7.1/dist/event-calendar.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/dayjs.min.js"></script>
-    {% endblock %}
+   {% block javascripts %}
+       <script src="https://cdn.jsdelivr.net/npm/@event-calendar/build@5.0.2/dist/event-calendar.min.js"></script>
+       <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/dayjs.min.js"></script>
+   {% endblock %}
 
     {% block stylesheets %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.7.1/dist/event-calendar.min.css">
-
-        <style>
-            .ec-timeline .ec-time, .ec-timeline .ec-line {
-                width: 16px;
-            }
-            .ec-timeline .ec-time {
-                overflow: visible;
-            }
-            .ec-timeline .ec-time time {
-                display: inline-block;
-                width: 64px;
-                text-align: center;
-            }
-        </style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@event-calendar/build@5.0.2/dist/event-calendar.min.css">
     {% endblock %}

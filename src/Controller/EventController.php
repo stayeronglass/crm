@@ -15,7 +15,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 final class EventController extends AbstractController
 {
     #[Route('/events', name: 'app_events')]
-    public function index(ResourceRepository $repository, EntityManagerInterface $em): Response
+    public function index(ResourceRepository $repository): Response
     {
 
         $form = $this->createForm(EventType::class, new Event(),[
@@ -23,33 +23,12 @@ final class EventController extends AbstractController
             'method' => 'POST',
         ]);
 
-        $repository->setChildrenIndex('children');
-        $resources = [];
-        $roots = $repository->getRootNodes();
-
-        foreach ($roots as $r){
-            $tree = $repository->childrenHierarchy(
-                $r, /* starting node (null for entire tree) */
-                false, /* direct children only */
-                [], /* options */
-                false /* include the root node in the result */
-            );
-            if (count($tree) == 0 ){
-                $resources[] = [
-                    'id' => $r->getId(),
-                    'title' => $r->getTitle(),
-                ];
-            }
-            foreach ($tree as $t){
-                $t['title'] = $r->getTitle() . '/' . $t['title'] ;
-                $resources[] = $t;
-            }
-        }
+        $root = $repository->find(1);
+        $res  = $repository->getLeafsQuery($root)->getArrayResult();
 
         return $this->render('event/index.html.twig', [
             'form' => $form,
-            'resources' => $resources,
-            'm' => $resources,
+            'resources' => $res,
         ]);
     }
 }
