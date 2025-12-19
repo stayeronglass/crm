@@ -107,8 +107,8 @@ final class AjaxController extends AbstractController
     #[Route('/ajax/event/delete', name: 'app_ajax_event_delete', methods: ['POST'])]
     public function delete(Request $request, EntityManagerInterface $em): Response
     {
-        $event = $em->getRepository(Event::class)->findOneBy(['slot' => $request->request->get('id')]);
-        if (empty($event)) {
+        $event = $em->getRepository(Event::class)->find($request->request->get('id'));
+        if (!$event) {
             return new JsonResponse([
                 'success' => false,
                 'errors'  => ['Событие не найдено!']

@@ -23,9 +23,11 @@ class SlotType extends AbstractType
         $builder
             ->add('title', null, [
                 'label' => 'Название',
+                'required' => true,
             ])
             ->add('description', null, [
                 'label' => 'Описание',
+                'required' => true,
             ])
             ->add('dayOfWeek', WeekAndTimeType::class, [
                 'mapped'   => false,
@@ -34,25 +36,25 @@ class SlotType extends AbstractType
                 'help'     => 'Если не выбрать то будет один раз',
             ])
             ->add('price', null, [
-                'required' => 'false',
+                'required' => false,
                 'label'    => 'Цена',
             ])
             ->add('dateBegin', null, [
                 'widget'   => 'single_text',
                 'label'    => 'Начало',
-                'required' => 'true',
+                'required' => true,
             ])
             ->add('dateEnd', null, [
                 'widget'   => 'single_text',
                 'label'    => 'Окончание',
-                'required' => 'true',
+                'required' => true,
             ])
             ->add('resources', EntityType::class, [
                 'class'         => Resource::class,
                 'choice_label'  => 'title',
                 'multiple'      => true,
                 'label'         => 'Место',
-                'required'      => 'true',
+                'required'      => true,
                 'query_builder' => function (ResourceRepository $r): \Doctrine\ORM\QueryBuilder {
                     $root = $r->find(1);
                     return $r->getLeafsQueryBuilder($root);
@@ -63,7 +65,7 @@ class SlotType extends AbstractType
                 'choice_label' => 'title',
                 'multiple'     => true,
                 'label'        => 'Услуга',
-                'required'     => 'true',
+                'required'     => true,
             ])
             ->add('color', ColorType::class, [
                 'label'      => 'Цвет',
@@ -84,11 +86,11 @@ class SlotType extends AbstractType
                 $form
                     ->add('edit', ButtonType::class, [
                         'label' => 'Сохранить',
-                        'attr'  => ['class' => 'btn btn-success', 'onclick' => 'create_slot(this)']
+                        'attr'  => ['class' => 'btn btn-success', 'onclick' => "edit_slot({$slot->getId()})"]
                     ])
                     ->add('delete', ButtonType::class, [
                         'label' => 'Удалить',
-                        'attr'  => ['class' => 'btn btn-danger', 'onclick' => 'deleteSlot()']
+                        'attr'  => ['class' => 'btn btn-danger', 'onclick' => "delete_slot({$slot->getId()})"]
                     ])
                 ;
             }
@@ -96,7 +98,7 @@ class SlotType extends AbstractType
                 'label' => 'Закрыть',
                 'attr'  => ['class' => 'btn btn-primary', 'onclick' => 'ec.unselect();dialog.close();']
             ]);
-        });;
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
