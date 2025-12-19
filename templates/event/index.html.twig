@@ -22,9 +22,29 @@
     <br />
     <div id="ec"></div>
 
-    <dialog id="dialog" >
+    <dialog id="dialog" style="width: 80%">
+        {{ form_start(form) }}
         <h1 id="form_h1">Новая Запись</h1>
-        {{ form(form, {'attr': {'id': 'form_event'}}) }}
+        <div class="section-one">
+            <h2 style="font-weight: bold">Запись</h2>
+            {{ form_row(form.dateBegin) }}
+            {{ form_row(form.dateEnd) }}
+            {{ form_row(form.service) }}
+            {{ form_row(form.resource) }}
+            {{ form_row(form.comment) }}
+            {{ form_row(form.color) }}
+        </div>
+        <hr />
+        <div class="section-two">
+            <h2 style="font-weight: bold">Клиент</h2>
+            {{ form_row(form.clientPhone) }}
+            {{ form_row(form.clientName) }}
+            {{ form_row(form.clientEmail) }}
+            {{ form_row(form.clientsNumber) }}
+        </div>
+
+        {{ form_rest(form) }}
+        {{ form_end(form) }}
     </dialog>
 
 
@@ -47,7 +67,7 @@
             document.getElementById('event_dateBegin').value = event.startStr;
             document.getElementById('event_dateEnd').value = event.endStr;
 
-            //document.getElementById('event_comment').value = event.comment;
+            document.getElementById('event_comment').value = "";
 
             const selectElement = document.getElementById("event_resource");
             const options = selectElement.getElementsByTagName("option");
@@ -255,6 +275,8 @@
                                 data.flashMessages.forEach(function(flash) {
                                     // Create and append a div for the flash message
                                     $.notify(flash, "success");
+                                    ec.refetchEvents();
+                                    dialog.close();
                                 });
                             } else {
                                 Object.keys(data.errors).forEach(key => {
@@ -266,8 +288,7 @@
                                     }
                                 });
                             }
-                            dialog.close();
-                            ec.refetchEvents();
+
                         })
                         .catch(error => {
                             console.error('Network error or server issue:', error);

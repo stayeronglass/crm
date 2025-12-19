@@ -44,6 +44,22 @@ class EventType extends AbstractType
                 'label' => 'Цвет',
                 'empty_data' => '',
             ])
+            ->add('clientPhone', null, [
+                'label' => 'Телефон',
+                'empty_data' => '',
+            ])
+            ->add('clientName', null, [
+                'label' => 'Имя клиента',
+                'empty_data' => '',
+            ])
+            ->add('clientEmail', null, [
+                'label' => 'Email клиента',
+                'empty_data' => '',
+            ])
+            ->add('clientsNumber', null, [
+                'label' => 'Количество мест',
+                'empty_data' => '',
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Создать',
             ])

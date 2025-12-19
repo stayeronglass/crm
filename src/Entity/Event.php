@@ -63,31 +63,36 @@ class Event implements Timestampable, SoftDeleteable
 
 
     #[ORM\Column(type: Types::STRING, length: 7, nullable: false)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Пустой цвет!')]
     #[Assert\Length(min: 7,max: 7,)]
-    #[Assert\Regex('/^#[0-9a-f]{6}$/i')]
+    #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Неверный формат цвета!')]
     private ?string $color;
 
     #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 10,max: 10,)]
-    #[Assert\Regex('/^[0-9]{10}$/i')]
+    #[Assert\NotBlank(message: 'Пустой телефон клиента!')]
+    #[Assert\Length(min: 10,max: 10,  minMessage: 'Слишком короткий телефон (должен быть ровно 10 цифр)!', maxMessage: 'Слишком длинный телефон (должен быть ровно 10 цифр)!',)]
+    #[Assert\Regex('/^[0-9]{10}$/i', message: 'Неверный формат телефона (должен быть ровно 10 цифр)!')]
     private ?string $clientPhone;
 
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 3,max: 255,)]
+    #[Assert\NotBlank(message: 'Пустое имя клиента!')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Имя клиента должно быть хотя бы {{ min }} символа',
+        maxMessage: 'Имя клиента не может быть больше {{ max }} символов',
+    )]
     private ?string $clientName;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Пустой email клиента!')]
     #[Assert\Length(min: 3,max: 255,)]
-    #[Assert\Email]
+    #[Assert\Email(message: 'Неверный формат email!')]
     private ?string $clientEmail;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Пустое количество клиентов!')]
     private ?int $clientsNumber;
 
     public function getId(): ?int
