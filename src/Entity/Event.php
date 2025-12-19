@@ -87,12 +87,17 @@ class Event implements Timestampable, SoftDeleteable
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Пустой email клиента!')]
-    #[Assert\Length(min: 3,max: 255,)]
+    #[Assert\Length(min: 3,max: 255,
+        minMessage: 'Email должен быть хотя бы {{ min }} символа',
+        maxMessage: 'Email не может быть больше {{ max }} символов',
+    )]
     #[Assert\Email(message: 'Неверный формат email!')]
     private ?string $clientEmail;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
     #[Assert\NotBlank(message: 'Пустое количество клиентов!')]
+    #[Assert\GreaterThan(0, message: 'Количество клиентов должно быть больше нуля!')]
+    #[Assert\LessThan(100, message: 'Количество клиентов должно быть меньше 100!')]
     private ?int $clientsNumber;
 
     public function getId(): ?int

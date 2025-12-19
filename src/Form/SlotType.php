@@ -24,6 +24,9 @@ class SlotType extends AbstractType
             ->add('title', null, [
                 'label' => 'Название',
                 'required' => true,
+                'attr' => [
+                    'maxlength' => 255, // Sets HTML <input maxlength="255">
+                ],
             ])
             ->add('description', null, [
                 'label' => 'Описание',
@@ -95,7 +98,7 @@ class SlotType extends AbstractType
                 ;
             }
             $form->add('cancel', ButtonType::class, [
-                'label' => 'Закрыть',
+                'label' => 'Отмена',
                 'attr'  => ['class' => 'btn btn-primary', 'onclick' => 'ec.unselect();dialog.close();']
             ]);
         });

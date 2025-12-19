@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\CallbackTransformer;
 
 class EventType extends AbstractType
 {
@@ -64,30 +65,54 @@ class EventType extends AbstractType
             ->add('clientPhone', TelType::class, [
                 'label'      => 'Телефон',
                 'empty_data' => '',
-                'help'       => 'Будет использоваться для смс/телеграм/макс',
-                'attr'       => ['placeholder' => '+7111111111'],
+                'help'       => 'Будет использоваться для смс/телеграм/макс, 10 цифр, формат любой',
+                'attr'       => ['placeholder' => '+7111111111','maxlength' => 20,],
                 'required'   => true,
+
             ])
             ->add('clientName', null, [
                 'label'      => 'Имя клиента',
                 'empty_data' => '',
                 'help'       => 'ФИО или как к нему обращаться',
                 'required'   => true,
+                'attr' => [
+                    'maxlength' => 255, // Sets HTML <input maxlength="255">
+                ],
             ])
             ->add('clientEmail', EmailType::class, [
                 'label'    => 'Email клиента',
-                'attr'     => ['placeholder' => 'email@example.ru'],
+                'attr'     => ['placeholder' => 'email@example.ru', 'maxlength' => 255],
                 'required' => true,
+
             ])
             ->add('clientsNumber', IntegerType::class, [
                 'label'    => 'Количество мест',
                 'required' => true,
+                'attr' => [
+                    'min' => 1,   // Sets HTML <input min="1">
+                    'max' => 100, // Sets HTML <input max="100">
+                ],
             ])
             ->add('cancel', ButtonType::class, [
-                'label' => 'Закрыть',
+                'label' => 'Отмена',
                 'attr'  => ['class' => 'btn btn-secondary', 'onclick' => 'ec.unselect();dialog.close();']
             ])
         ;
+
+        $builder->get('clientPhone')
+            ->addModelTransformer(new CallbackTransformer(
+            // The transform function (model data to form data) - usually not needed for this
+                function ($originalData) {
+                    return '+'.$originalData;
+                },
+                // The reverseTransform function (submitted data to model data)
+                function ($submittedData) {
+                    if (null === $submittedData) {
+                        return null;
+                    }
+                    return \preg_replace('/\D/', '', $submittedData);
+                }
+            ));
 
 //        ->addEventListener(
 //        FormEvents::PRE_SET_DATA,
