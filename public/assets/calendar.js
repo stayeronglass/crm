@@ -42,5 +42,7 @@ function addEvent(event) {
 }
 
 const dialog = document.querySelector('dialog');
+const event_edit_dialog = document.querySelector('event_edit_dialog');
+
 
 

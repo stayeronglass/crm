@@ -3,9 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
-use App\Validator\EventPriority;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\SoftDeleteable\SoftDeleteable;
@@ -29,33 +26,37 @@ class Event implements Timestampable, SoftDeleteable
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\NotBlank]
+    #[Assert\Length(min: 3,max: 100000,
+        minMessage: 'Комментарий быть хотя бы {{ min }} символа',
+        maxMessage: 'Комментарий не может быть больше {{ max }} символов',
+    )]
     private ?string $comment;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[Assert\NotNull(message: 'Не выбрана дата начала!')]
+    #[Assert\NotBlank(message: 'Не выбрана дата начала!')]
     #[Assert\Type(\DateTimeInterface::class)]
     #[Assert\GreaterThan('now', message: 'Дата начала не может быть в прошлом!')]
     #[Assert\LessThan('next year', message: 'Слишком большая дата начала!')]
     private \DateTimeImmutable $dateBegin;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[Assert\NotNull(message: 'Не выбрана дата окончания!')]
+    #[Assert\NotBlank(message: 'Не выбрана дата окончания!')]
     #[Assert\Type(\DateTimeInterface::class)]
-    #[Assert\GreaterThan(propertyPath: 'dateBegin', message: 'Дата начала должна быть больше даты кончания!')]
+    #[Assert\GreaterThan(propertyPath: 'dateBegin', message: 'Дата окончания должна быть больше даты кончания!')]
     #[Assert\GreaterThan('now', message: 'Дата окончания не может быть в прошлом!')]
     #[Assert\LessThan('next year', message: 'Слишком большая дата окончания!')]
     private \DateTimeImmutable $dateEnd;
 
     #[ORM\ManyToOne(targetEntity: Resource::class)]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[Assert\NotNull(message: 'Не выбрано место!')]
+    #[Assert\NotBlank(message: 'Не выбрано место!')]
     private ?Resource $resource;
 
     #[ORM\ManyToOne(targetEntity: Service::class)]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[Assert\NotNull(message: 'Не выбрана услуга!')]
+    #[Assert\NotBlank(message: 'Не выбрана услуга!')]
     private ?Service $service;
 
     #[ORM\ManyToOne(targetEntity: Slot::class)]
@@ -68,14 +69,16 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Неверный формат цвета!')]
     private ?string $color;
 
-    #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 11, nullable: true)]
+    #[Assert\NotNull(message: 'Пустой телефон клиента!')]
     #[Assert\NotBlank(message: 'Пустой телефон клиента!')]
-    #[Assert\Length(min: 10,max: 10,  minMessage: 'Слишком короткий телефон (должен быть ровно 10 цифр)!', maxMessage: 'Слишком длинный телефон (должен быть ровно 10 цифр)!',)]
-    #[Assert\Regex('/^[0-9]{10}$/i', message: 'Неверный формат телефона (должен быть ровно 10 цифр)!')]
+    #[Assert\Length(min: 11,max: 11,  minMessage: 'Слишком короткий телефон (должен быть ровно 11 цифр)!', maxMessage: 'Слишком длинный телефон (должен быть ровно 10 цифр)!',)]
+    #[Assert\Regex('/^[0-9]{11}$/i', message: 'Неверный формат телефона (должен быть ровно 11 цифр)!')]
     private ?string $clientPhone;
 
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Assert\NotNull(message: 'Пустое имя клиента!')]
     #[Assert\NotBlank(message: 'Пустое имя клиента!')]
     #[Assert\Length(
         min: 3,
@@ -95,6 +98,7 @@ class Event implements Timestampable, SoftDeleteable
     private ?string $clientEmail;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    #[Assert\NotNull(message: 'Пустое количество клиентов!')]
     #[Assert\NotBlank(message: 'Пустое количество клиентов!')]
     #[Assert\GreaterThan(0, message: 'Количество клиентов должно быть больше нуля!')]
     #[Assert\LessThan(100, message: 'Количество клиентов должно быть меньше 100!')]

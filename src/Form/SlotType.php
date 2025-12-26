@@ -22,15 +22,18 @@ class SlotType extends AbstractType
     {
         $builder
             ->add('title', null, [
-                'label' => 'Название',
+                'label'    => 'Название',
                 'required' => true,
-                'attr' => [
+                'attr'     => [
                     'maxlength' => 255, // Sets HTML <input maxlength="255">
                 ],
             ])
             ->add('description', null, [
-                'label' => 'Описание',
+                'label'    => 'Описание',
                 'required' => true,
+                'attr'     => [
+                    'maxlength' => 10000, // Sets HTML <input maxlength="255">
+                ],
             ])
             ->add('dayOfWeek', WeekAndTimeType::class, [
                 'mapped'   => false,
@@ -71,8 +74,7 @@ class SlotType extends AbstractType
                 'required'     => true,
             ])
             ->add('color', ColorType::class, [
-                'label'      => 'Цвет',
-                'empty_data' => '',
+                'label' => 'Цвет',
             ])
         ;
 
@@ -80,27 +82,31 @@ class SlotType extends AbstractType
             $slot = $event->getData();
             $form = $event->getForm();
 
+            $form->add('cancel', ButtonType::class, [
+                'label' => 'Отмена',
+                'attr'  => ['class' => 'btn btn-primary', 'onclick' => 'ec.unselect();dialog.close();']
+            ]);
+
             if (!$slot || null === $slot->getId()) {
                 $form->add('submit', ButtonType::class, [
                     'label' => 'Создать',
                     'attr'  => ['class' => 'btn btn-secondary', 'onclick' => 'create_slot(this)']
                 ]);
-            } else {
-                $form
-                    ->add('edit', ButtonType::class, [
-                        'label' => 'Сохранить',
-                        'attr'  => ['class' => 'btn btn-success', 'onclick' => "edit_slot({$slot->getId()})"]
-                    ])
-                    ->add('delete', ButtonType::class, [
-                        'label' => 'Удалить',
-                        'attr'  => ['class' => 'btn btn-danger', 'onclick' => "delete_slot({$slot->getId()})"]
-                    ])
-                ;
+
+                return;
+
             }
-            $form->add('cancel', ButtonType::class, [
-                'label' => 'Отмена',
-                'attr'  => ['class' => 'btn btn-primary', 'onclick' => 'ec.unselect();dialog.close();']
-            ]);
+            $form
+                ->add('edit', ButtonType::class, [
+                    'label' => 'Сохранить',
+                    'attr'  => ['class' => 'btn btn-success', 'onclick' => "create_slot({$slot->getId()})"]
+                ])
+                ->add('delete', ButtonType::class, [
+                    'label' => 'Удалить',
+                    'attr'  => ['class' => 'btn btn-danger', 'onclick' => "delete_slot({$slot->getId()})"]
+                ])
+            ;
+
         });
     }
 

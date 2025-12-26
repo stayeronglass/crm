@@ -4,9 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Form\EventType;
+use App\Form\SlotType;
+use App\Repository\EventRepository;
 use App\Repository\ResourceRepository;
+use App\Repository\SlotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -30,5 +34,21 @@ final class EventController extends AbstractController
             'form' => $form,
             'resources' => $res,
         ]);
+    }
+
+    #[Route('/form_edit', name: 'app_event_form_edit', methods: ['GET', 'POST'])]
+    public function form_edit(EventRepository $repository, Request $request): Response
+    {
+        $event = $repository->find($request->request->get('id'));
+        $form = $this->createForm(EventType::class, $event, [
+            'action' => $this->generateUrl('app_ajax_event_edit', ['id' => $event->getId()]),
+            'method' => 'POST',
+        ]);
+
+        $result = $this->renderView('event/_form_edit.html.twig', [
+            'form' => $form,
+        ]);
+
+        return new Response($result, Response::HTTP_OK);
     }
 }

@@ -11,11 +11,12 @@
         "doctrine/dbal": "^3.10.4",
         "doctrine/doctrine-bundle": "^2.18.1",
         "doctrine/doctrine-migrations-bundle": "^3.7",
-        "doctrine/orm": "^3.5.8",
-        "easycorp/easyadmin-bundle": "^4.27.4",
-        "gedmo/doctrine-extensions": "^3.21",
+        "doctrine/orm": "^3.6.0",
+        "easycorp/easyadmin-bundle": "^4.27.5",
+        "gedmo/doctrine-extensions": "^3.22",
         "phpdocumentor/reflection-docblock": "^5.6.5",
         "phpstan/phpdoc-parser": "^2.3",
+        "stayeronglass/better-fosuser-bundle": "dev-master@dev",
         "symfony/asset": "7.3.*",
         "symfony/asset-mapper": "7.3.*",
         "symfony/console": "7.3.*",
@@ -29,7 +30,7 @@
         "symfony/intl": "7.3.*",
         "symfony/mailer": "7.3.*",
         "symfony/mime": "7.3.*",
-        "symfony/monolog-bundle": "^3.11",
+        "symfony/monolog-bundle": "^3.11.1",
         "symfony/notifier": "7.3.*",
         "symfony/process": "7.3.*",
         "symfony/property-access": "7.3.*",
@@ -45,9 +46,8 @@
         "symfony/validator": "7.3.*",
         "symfony/web-link": "7.3.*",
         "symfony/yaml": "7.3.*",
-        "twig/extra-bundle": "^2.12|^3.22.1",
-        "twig/twig": "^2.12|^3.22.1",
-        "stayeronglass/better-fosuser-bundle": "dev-master@dev"
+        "twig/extra-bundle": "^2.12|^3.22.2",
+        "twig/twig": "^2.12|^3.22.2"
     },
     "config": {
         "allow-plugins": {
@@ -101,11 +101,11 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^12.4.5",
+        "phpunit/phpunit": "^12.5.4",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",
-        "symfony/maker-bundle": "^1.65",
+        "symfony/maker-bundle": "^1.65.1",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*"
     },

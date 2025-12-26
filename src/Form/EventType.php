@@ -65,8 +65,8 @@ class EventType extends AbstractType
             ->add('clientPhone', TelType::class, [
                 'label'      => 'Телефон',
                 'empty_data' => '',
-                'help'       => 'Будет использоваться для смс/телеграм/макс, 10 цифр, формат любой',
-                'attr'       => ['placeholder' => '+7111111111','maxlength' => 20,],
+                'help'       => 'Будет использоваться для смс/телеграм/макс, 11 цифр, формат любой',
+                'attr'       => ['placeholder' => '+7111111111','maxlength' => 12,],
                 'required'   => true,
 
             ])
@@ -93,10 +93,7 @@ class EventType extends AbstractType
                     'max' => 100, // Sets HTML <input max="100">
                 ],
             ])
-            ->add('cancel', ButtonType::class, [
-                'label' => 'Отмена',
-                'attr'  => ['class' => 'btn btn-secondary', 'onclick' => 'ec.unselect();dialog.close();']
-            ])
+
         ;
 
         $builder->get('clientPhone')
@@ -122,18 +119,29 @@ class EventType extends AbstractType
             $e = $event->getData();
             $form = $event->getForm();
             if (!$e || null === $e->getId()) {
-                $form->add('submit', SubmitType::class, [
+                $form
+                ->add('cancel', ButtonType::class, [
+                    'label' => 'Отмена',
+                    'attr'  => ['class' => 'btn btn-secondary', 'onclick' => 'ec.unselect();dialog.close();']
+                ])
+                ->add('submit', ButtonType::class, [
                     'label' => 'Создать',
+                    'attr'  => ['class' => 'btn btn-success', 'onclick' => "create_event()"]
                 ]);
             } else {
                 $form
-                    ->add('edit', ButtonType::class, [
-                        'label' => 'Сохранить',
-                        'attr'  => ['class' => 'btn btn-success', 'onclick' => "edit_event({$e->getId()})"]
+                    ->add('cancel', ButtonType::class, [
+                        'label' => 'Отмена',
+                        'attr'  => ['class' => 'btn btn-secondary', 'onclick' => 'event_edit_dialog.close();']
                     ])
+
                     ->add('delete', ButtonType::class, [
                         'label' => 'Удалить',
                         'attr'  => ['class' => 'btn btn-danger', 'onclick' => "delete_event({$e->getId()})"]
+                    ])
+                    ->add('edit', ButtonType::class, [
+                        'label' => 'Сохранить',
+                        'attr'  => ['class' => 'btn btn-success', 'onclick' => "create_event({$e->getId()})"]
                     ])
                 ;
             }

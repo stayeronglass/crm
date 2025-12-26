@@ -21,6 +21,7 @@
     <br />
     <br />
     <div id="ec"></div>
+    <dialog id="event_edit_dialog" style="width: 80%"></dialog>
 
     <dialog id="dialog" style="width: 80%">
         {{ form_start(form) }}
@@ -200,8 +201,11 @@
                     url: "{{ path('app_ajax_event_resize') }}",
                     data: {
                         id: info.event.id,
-                        start: new Date(info.event.start.getTime() - (info.event.start.getTimezoneOffset() * 60000)).toISOString(),
-                        end: new Date(info.event.end.getTime() - (info.event.end.getTimezoneOffset() * 60000)).toISOString(),
+                        start: new Date(info.event.start.getTime()).toISOString(),
+                        end: new Date(info.event.end.getTime()).toISOString(),
+
+                        // start: new Date(info.event.start.getTime() - (info.event.start.getTimezoneOffset() * 60000)).toISOString(),
+                        // end: new Date(info.event.end.getTime() - (info.event.end.getTimezoneOffset() * 60000)).toISOString(),
                     },
                     method: "POST",
                     async: false, // This makes the call synchronous
@@ -255,9 +259,25 @@
                 if ((info.event.display === 'background') || (info.event.editable === false )){
                     return false;
                 }
-                document.getElementById('form_h1').textContent = "Редактировать событие " + info.event.start.toLocaleString() + " - " + info.event.end.toLocaleString();
+                let result = null;
+                $.ajax({
+                    url: "{{ path('app_event_form_edit') }}",
+                    data: {
+                        id: info.event.id,
+                    },
+                    method: "POST",
+                    async: false, // This makes the call synchronous
+                    success: function(data) {
+                        result = data;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
 
-                showModal(info.event);
+                event_edit_dialog.innerHTML = result;
+                //event_edit_dialog.getElementById('form_h1').textContent = "Редактировать событие " + info.event.start.toLocaleString() + " - " + info.event.end.toLocaleString();
+                event_edit_dialog.showModal();
             }
         });
 
@@ -284,50 +304,65 @@
             return (norm < 10 ? '0' : '') + norm;
         }
 
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('[name="event"]');
-
-            if (form) {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Prevent default form submission
-
-                    const formData = new FormData(form); // Or serialize to JSON
-
-                    fetch(form.action, {
-                        method: form.method,
-                        body: formData, // Or JSON.stringify(Object.fromEntries(formData))
-                        headers: {
-                            'Accept': 'application/json' // Expecting JSON response
-                        }
-                    })
-                        .then(response => response.json()) // Parse JSON response
-                        .then(data => {
-                            if (data.success) {
-                                data.flashMessages.forEach(function(flash) {
-                                    // Create and append a div for the flash message
-                                    $.notify(flash, "success");
-                                    ec.refetchEvents();
-                                    dialog.close();
-                                });
-                            } else {
-                                Object.keys(data.errors).forEach(key => {
-                                    if (data.errors[key][0].length > 1)
-                                    {
-                                        $.notify(data.errors[key][0],"error");
-                                    } else {
-                                        $.notify(data.errors[key],"error");
-                                    }
-                                });
-                            }
-
-                        })
-                        .catch(error => {
-                            console.error('Network error or server issue:', error);
-                        });
+function delete_event(id) {
+    $.ajax({
+        url: "{{ path('app_ajax_event_delete') }}",
+        data: {
+            id: id
+        },
+        method: "POST",
+        async: false, // This makes the call synchronous
+        success: function(data) {
+            if (data.success) {
+                data.flashMessages.forEach(function(flash) {
+                    $.notify(flash, "success");
+                    ec.refetchEvents();
+                    event_edit_dialog.close();
+                });
+            } else {
+                data.errors.forEach(function(flash) {
+                    $.notify(flash, "error");
                 });
             }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error:", error);
+        }
+    });
+}
+function create_event(id) {
+    const form = document.querySelector('[name="event"]');
+    const formData = new FormData(form); // Or serialize to JSON
+
+    fetch(form.action, {
+        method: form.method,
+        body: formData, // Or JSON.stringify(Object.fromEntries(formData))
+        headers: {
+            'Accept': 'application/json' // Expecting JSON response
+        }
+    })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.success) {
+                data.flashMessages.forEach(function(flash) {
+                    $.notify(flash, "success");
+                });
+                ec.refetchEvents();
+                if(typeof id !== 'undefined'){
+                    event_edit_dialog.close()
+                } else {
+                    dialog.close()
+                }
+            } else {
+                data.errors.forEach(function(flash) {
+                    $.notify(flash, "error");
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Network error or server issue:', error);
         });
+    }
 
         function getStaffMembers(elem){
 

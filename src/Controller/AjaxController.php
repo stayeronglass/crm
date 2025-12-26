@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Constraints\Timezone;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_USER')]
@@ -133,7 +134,7 @@ final class AjaxController extends AbstractController
             'errors'  => ['Событие не найдено!'
             ]]);
 
-        $begin = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $request->request->get('start'));;
+        $begin = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $request->request->get('start'));
         if (!$begin) return new JsonResponse([
             'success' => false,
             'errors'  => ['Неверная дата начала!'
@@ -146,8 +147,8 @@ final class AjaxController extends AbstractController
             ]]);
 
         $event
-            ->setDateBegin($begin)
-            ->setDateEnd($end)
+            ->setDateBegin($begin->setTimezone(new \DateTimeZone("Europe/Moscow")))
+            ->setDateEnd($end->setTimezone(new \DateTimeZone("Europe/Moscow")))
         ;
 
         $errors = $validator->validate($event);

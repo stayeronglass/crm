@@ -13,7 +13,6 @@ use Gedmo\Timestampable\Timestampable;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[\Attribute]
 #[ORM\Entity(repositoryClass: SlotRepository::class)]
 #[ORM\Index(columns: ['date_begin','date_end'])]
 class Slot implements Timestampable, SoftDeleteable
@@ -26,34 +25,45 @@ class Slot implements Timestampable, SoftDeleteable
     private ?int $id = null;
     #[ORM\Column(length: 255, nullable: false)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 3,max: 255,)]
+    #[Assert\Length(min: 3,max: 255,
+        minMessage: 'Название быть хотя бы {{ min }} символа',
+        maxMessage: 'Название не может быть больше {{ max }} символов',
+    )]
     private string $title;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\NotBlank]
+    #[Assert\Length(min: 3,max: 100000,
+        minMessage: 'Описание быть хотя бы {{ min }} символа',
+        maxMessage: 'Описание не может быть больше {{ max }} символов',
+    )]
     private ?string $description;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[Assert\NotNull(message: 'Не выбрана дата начала!')]
+    #[Assert\NotBlank(message: 'Не выбрана дата начала!')]
     #[Assert\Type(\DateTimeInterface::class)]
     #[Assert\GreaterThan('now', message: 'Дата начала не может быть в прошлом!')]
     #[Assert\LessThan('next year', message: 'Слишком большая дата начала!')]
     private \DateTimeImmutable $dateBegin;
 
     #[ORM\Column(type: 'datetimetz_immutable')]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[Assert\NotNull(message: 'Не выбрана дата окончания!')]
+    #[Assert\NotBlank(message: 'Не выбрана дата окончания!')]
     #[Assert\Type(\DateTimeInterface::class)]
-    #[Assert\GreaterThan(propertyPath: 'dateBegin', message: 'Дата начала должна быть больше даты кончания!')]
+    #[Assert\GreaterThan(propertyPath: 'dateBegin', message: 'Дата окончания должна быть больше даты кончания!')]
     #[Assert\GreaterThan('now', message: 'Дата окончания не может быть в прошлом!')]
     #[Assert\LessThan('next year', message: 'Слишком большая дата окончания!')]
     private \DateTimeImmutable $dateEnd;
 
     #[ORM\ManyToMany(targetEntity: Resource::class, inversedBy: 'slots')]
+    #[Assert\NotNull(message: 'Не выбрано место!')]
+    #[Assert\NotBlank(message: 'Не выбрано место!')]
     private Collection $resources;
 
     #[ORM\ManyToMany(targetEntity: Service::class)]
+    #[Assert\NotNull(message: 'Не выбрана услуга!')]
+    #[Assert\NotBlank(message: 'Не выбрана услуга!')]
     private Collection $services;
 
 

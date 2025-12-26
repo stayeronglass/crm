@@ -62,5 +62,21 @@
             </tr>
         </table>
     </div>
+<div class="row">
+    <div class="col">
+        {{ form_row(form.dateBegin) }}
+    </div>
+    <div class="col">
+        {{ form_row(form.dateEnd) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{ form_row(form.cancel) }}
+    </div>
+    <div class="col">
+        {{ form_row(form.submit) }}
+    </div>
+</div>
     {{ form_rest(form) }}
     {{ form_end(form) }}
