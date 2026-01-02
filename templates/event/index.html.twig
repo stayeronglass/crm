@@ -46,24 +46,26 @@
             </div>
             {{ form_row(form.comment) }}
             {{ form_row(form.color) }}
+            {{ form_row(form.clientsNumber) }}
         </div>
-        <hr />
         <div class="section-two">
             <h2 style="font-weight: bold">Клиент</h2>
             <div class="row">
                 <div class="col">
-            {{ form_row(form.clientName) }}
+            {{ form_row(form.client.name) }}
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                 {{ form_row(form.clientPhone) }}
+                 {{ form_row(form.client.phone) }}
                 </div>
                 <div class="col">
-                    {{ form_row(form.clientEmail) }}
+                    {{ form_row(form.client.email) }}
+                </div>
+                <div class="col">
+                    {{ form_row(form.client.telegram) }}
                 </div>
             </div>
-            {{ form_row(form.clientsNumber) }}
         </div>
             <div class="row">
                 <div class="col">
@@ -97,10 +99,15 @@
             document.getElementById('event_dateBegin').value = event.startStr;
             document.getElementById('event_dateEnd').value = event.endStr;
 
+
             document.getElementById('event_comment').value = "";
-            document.getElementById('event_clientPhone').value = "";
-            document.getElementById('event_clientEmail').value = "";
             document.getElementById('event_clientsNumber').value = 0;
+
+            document.getElementById('event_client_name').value = "";
+            document.getElementById('event_client_phone').value = "";
+            document.getElementById('event_client_email').value = "";
+            document.getElementById('event_client_telegram').value = "";
+
 
             const selectElement = document.getElementById("event_resource");
             const options = selectElement.getElementsByTagName("option");
@@ -330,6 +337,7 @@ function delete_event(id) {
         }
     });
 }
+
 function create_event(id) {
     const form = document.querySelector('[name="event"]');
     const formData = new FormData(form); // Or serialize to JSON
@@ -347,12 +355,13 @@ function create_event(id) {
                 data.flashMessages.forEach(function(flash) {
                     $.notify(flash, "success");
                 });
-                ec.refetchEvents();
+                dialog.event.backgroundColor = formData.color;
                 if(typeof id !== 'undefined'){
                     event_edit_dialog.close()
                 } else {
                     dialog.close()
                 }
+                ec.refetchEvents();
             } else {
                 data.errors.forEach(function(flash) {
                     $.notify(flash, "error");

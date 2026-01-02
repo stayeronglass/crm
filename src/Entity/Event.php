@@ -62,6 +62,11 @@ class Event implements Timestampable, SoftDeleteable
     #[ORM\ManyToOne(targetEntity: Slot::class)]
     private ?Slot $slot;
 
+    #[ORM\ManyToOne(targetEntity: Client::class, cascade: ['persist'])]
+    #[Assert\NotNull(message: 'Нет клиента!')]
+    #[Assert\NotBlank(message: 'Нет клиента!')]
+    private ?Client $client;
+
 
     #[ORM\Column(type: Types::STRING, length: 7, nullable: false)]
     #[Assert\NotBlank(message: 'Пустой цвет!')]
@@ -69,33 +74,7 @@ class Event implements Timestampable, SoftDeleteable
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Неверный формат цвета!')]
     private ?string $color;
 
-    #[ORM\Column(type: Types::STRING, length: 11, nullable: true)]
-    #[Assert\NotNull(message: 'Пустой телефон клиента!')]
-    #[Assert\NotBlank(message: 'Пустой телефон клиента!')]
-    #[Assert\Length(min: 11,max: 11,  minMessage: 'Слишком короткий телефон (должен быть ровно 11 цифр)!', maxMessage: 'Слишком длинный телефон (должен быть ровно 10 цифр)!',)]
-    #[Assert\Regex('/^[0-9]{11}$/i', message: 'Неверный формат телефона (должен быть ровно 11 цифр)!')]
-    private ?string $clientPhone;
 
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    #[Assert\NotNull(message: 'Пустое имя клиента!')]
-    #[Assert\NotBlank(message: 'Пустое имя клиента!')]
-    #[Assert\Length(
-        min: 3,
-        max: 255,
-        minMessage: 'Имя клиента должно быть хотя бы {{ min }} символа',
-        maxMessage: 'Имя клиента не может быть больше {{ max }} символов',
-    )]
-    private ?string $clientName;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    #[Assert\NotBlank(message: 'Пустой email клиента!')]
-    #[Assert\Length(min: 3,max: 255,
-        minMessage: 'Email должен быть хотя бы {{ min }} символа',
-        maxMessage: 'Email не может быть больше {{ max }} символов',
-    )]
-    #[Assert\Email(message: 'Неверный формат email!')]
-    private ?string $clientEmail;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
     #[Assert\NotNull(message: 'Пустое количество клиентов!')]
@@ -157,42 +136,6 @@ class Event implements Timestampable, SoftDeleteable
         return $this;
     }
 
-    public function getClientPhone(): ?string
-    {
-        return $this->clientPhone;
-    }
-
-    public function setClientPhone(?string $clientPhone): static
-    {
-        $this->clientPhone = $clientPhone;
-
-        return $this;
-    }
-
-    public function getClientName(): ?string
-    {
-        return $this->clientName;
-    }
-
-    public function setClientName(?string $clientName): static
-    {
-        $this->clientName = $clientName;
-
-        return $this;
-    }
-
-    public function getClientEmail(): ?string
-    {
-        return $this->clientEmail;
-    }
-
-    public function setClientEmail(?string $clientEmail): static
-    {
-        $this->clientEmail = $clientEmail;
-
-        return $this;
-    }
-
     public function getClientsNumber(): ?string
     {
         return $this->clientsNumber;
@@ -240,6 +183,19 @@ class Event implements Timestampable, SoftDeleteable
 
         return $this;
     }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): static
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
 
 
 }
