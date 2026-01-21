@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Client\Yookassa;
 use App\Entity\Event;
 use App\Entity\Slot;
 use App\Form\EventType;
@@ -208,6 +210,29 @@ final class AjaxController extends AbstractController
             Response::HTTP_BAD_REQUEST // 400 status code
         );
     }
+
+    #[Route('/ajax/event/{id}/payment_link', name: 'app_ajax_event_payment_link')]
+    public function payment_link(Event $event, Yookassa $yookassa): JsonResponse
+    {
+        try {
+            $payment = $yookassa->getPaymentLink(
+                $event->getSlot()->getPrice(),
+                $event->getSlot()->getTitle(),
+                'http://chaletstudio.ru'
+            );
+        } catch (\Exception $e){
+            return new JsonResponse([
+                'success' => false,
+                'errors'  => $e->getMessage(),
+            ]);
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'link'    => $payment->getConfirmation()
+        ]);
+    }
+
     private function getErrorsFromForm(FormInterface $form): array
     {
         $errors = [];
