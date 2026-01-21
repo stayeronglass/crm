@@ -11,6 +11,7 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
+            $adminEmail: 'manager@example.com'
             #$redisDSN: '%env(string:REDIS_URL)%'
 
     # makes classes in src/ available to be used as services
@@ -43,3 +44,12 @@ services:
             - { name: doctrine.event_listener, event: 'loadClassMetadata' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Client\Yookassa:
+        arguments:
+            $secret: 'manager@example.com'
+    App\Client\AmoCRM:
+        arguments:
+            $secret: 'manager@example.com'
+    App\Client\Elastic:
+        arguments:
