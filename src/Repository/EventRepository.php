@@ -31,13 +31,13 @@ class EventRepository extends ServiceEntityRepository
 
         if ($dateStart !== null) {
             $dateStart = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateStart);
-            $q->andWhere('event.dateBegin >= :start')
+            $q->andWhere('event.dateBegin <= :start')
                 ->setParameter('start', $dateStart);
         }
 
         if ($dateEnd !== null) {
             $dateEnd = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateEnd);
-            $q->andWhere('event.dateEnd <= :end')
+            $q->andWhere('event.dateEnd >= :end')
                 ->setParameter('end', $dateEnd);
 
         }

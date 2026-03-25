@@ -22,13 +22,13 @@ class WeekAndTimeType extends AbstractType
                 'input'  => 'datetime',
                 'widget' => 'choice',
                 'label'  => false,
-                'attr' => ['class' => 'time_begin']
+                'attr' => ['class' => 'time_begin'],
             ])
             ->add('MondayTimeEnd', TimeType::class, [
                 'input'  => 'datetime',
                 'widget' => 'choice',
                 'label'  => false,
-                'attr' => ['class' => 'time_end']
+                'attr' => ['class' => 'time_end'],
             ])
 
             ->add('Tuesday', CheckboxType::class, [

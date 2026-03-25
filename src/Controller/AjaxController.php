@@ -38,7 +38,6 @@ final class AjaxController extends AbstractController
         $events = $repository->getEvents($request->get('start'), $request->get('end'));
         $slots  = $slotRepository->getSlots($request->get('start'), $request->get('end'));
         $result = [];
-
         /** @var Slot $slot */
         foreach ($slots as $slot) {
             $resourceIds = [];

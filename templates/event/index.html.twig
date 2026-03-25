@@ -82,6 +82,11 @@
 
 
     <script type="text/javascript">
+        dialog.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                ec.unselect()
+            }
+        });
 
         const resources = {{ resources|json_encode()|raw }}
 
@@ -340,6 +345,13 @@ function delete_event(id) {
 
 function create_event(id) {
     const form = document.querySelector('[name="event"]');
+
+    if (!form.reportValidity()) {
+        // Браузер сам покажет ошибки у полей
+        return;
+    }
+
+
     const formData = new FormData(form); // Or serialize to JSON
 
     fetch(form.action, {

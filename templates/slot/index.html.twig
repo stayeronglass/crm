@@ -56,8 +56,19 @@ console.log(event)
             });
             dialog.innerHTML = result;
 
-            document.getElementById('slot_dateBegin').value = event.startStr;
-            document.getElementById('slot_dateEnd').value = event.endStr;
+            event_start = event.start
+            event_end   = event.end
+
+            event_start.setHours(9)
+
+            event_end.setDate(event_end.getDate()-1)
+            event_end.setHours(23)
+
+            event_start = new Date(event_start.getTime() - (event_start.getTimezoneOffset() * 60000))
+            event_end   = new Date(event_end.getTime() - (event_end.getTimezoneOffset() * 60000))
+
+            document.getElementById('slot_dateBegin').value = event_start.toISOString().split('.')[0];
+            document.getElementById('slot_dateEnd').value = event_end.toISOString().split('.')[0];
 
             document.getElementById('slot_description').value = "";
             document.getElementById('form_h1').textContent = "Новый слот " + event.start.toLocaleString() + " - " + event.end.toLocaleString();
@@ -265,6 +276,12 @@ console.log(event)
 
         function create_slot(button) {
             const form = document.querySelector('[name="slot"]');
+
+            if (!form.reportValidity()) {
+                // Браузер сам покажет ошибки у полей
+                return;
+            }
+
             const formData = new FormData(form); // Or serialize to JSON
 
             fetch(form.action, {
@@ -410,6 +427,12 @@ console.log(event)
 
             dialog.close();
         }
+
+        dialog.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                ec.unselect()
+            }
+        });
     </script>
 
 

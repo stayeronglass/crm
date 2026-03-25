@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SlotRepository::class)]
 #[ORM\Index(columns: ['date_begin','date_end'])]
+#[ORM\Index(columns: ['slot_date'])]
 class Slot implements Timestampable, SoftDeleteable
 {
     use TimestampableEntity, SoftDeleteableEntity;
@@ -55,6 +56,10 @@ class Slot implements Timestampable, SoftDeleteable
     #[Assert\GreaterThan('now', message: 'Дата окончания не может быть в прошлом!')]
     #[Assert\LessThan('next year', message: 'Слишком большая дата окончания!')]
     private \DateTimeImmutable $dateEnd;
+
+
+    #[ORM\Column(type: 'date')]
+    private \DateTime $slotDate;
 
     #[ORM\ManyToMany(targetEntity: Resource::class, inversedBy: 'slots')]
     #[Assert\NotNull(message: 'Не выбрано место!')]
@@ -142,6 +147,18 @@ class Slot implements Timestampable, SoftDeleteable
         return $this;
     }
 
+    public function getSlotDate(): ?\DateTime
+    {
+        return $this->slotDate;
+    }
+
+    public function setSlotDate(\DateTime $slotDate): static
+    {
+        $this->slotDate = $slotDate;
+
+        return $this;
+    }
+
     public function getPrice(): ?float
     {
         return $this->price;
@@ -214,10 +231,5 @@ class Slot implements Timestampable, SoftDeleteable
         return $this;
     }
 
-
-    public function __toString():string
-    {
-        return $this->title;
-    }
 
 }

@@ -12,6 +12,9 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $adminEmail: 'manager@example.com'
+            $ClientID: '5otp63tgh5udte9p9nrn998o51a6lcld'
+            $ClientSecret: 'IEZzW5PTp9Nxpjc-_1mZfRLGYKpL1_esjEpNTakYLNb9t5_31OMUWvK5TTDUjswN'
+
             #$redisDSN: '%env(string:REDIS_URL)%'
 
     # makes classes in src/ available to be used as services

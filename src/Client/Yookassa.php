@@ -13,12 +13,12 @@ class Yookassa
     public function __construct(string $secret)
     {
         $client = new Client();
-        $client->setAuth('shopId', $secret);
+        $client->setAuth('фукпфукп', 'фукпуфкпфу');
 
         $this->client = $client;
     }
 
-    public function getPaymentLink($value, string $description, string $returnUrl): ?\YooKassa\Request\Payments\CreatePaymentResponse
+    public function getPaymentLink($value, string $description, string $returnUrl, array $receipt): ?\YooKassa\Request\Payments\CreatePaymentResponse
     {
         if (mb_strlen($description, 'UTF-8') > 128) {
             $len = mb_strlen($description, 'UTF-8');
@@ -36,6 +36,7 @@ class Yookassa
                 'return_url' => $returnUrl,
             ],
             'description'  => $description,
+            'receipt'      => $receipt,
         ]);
 
         return $payment;

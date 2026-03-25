@@ -27,16 +27,17 @@ class SlotRepository extends ServiceEntityRepository
 
         if ($dateStart !== null) {
             $dateStart = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateStart);
-            $q->andWhere('slot.dateBegin >= :start')
+            $q->andWhere('slot.slotDate >= :start')
                 ->setParameter('start', $dateStart);
         }
 
         if ($dateEnd !== null) {
             $dateEnd = DateTime::createFromFormat('Y-m-d\TH:i:s' , $dateEnd);
-            $q->andWhere('slot.dateEnd <= :end')
+            $q->andWhere('slot.slotDate <= :end')
                 ->setParameter('end', $dateEnd);
 
         }
+
         return $q->getQuery()
             ->getResult();
     }

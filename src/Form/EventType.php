@@ -49,6 +49,7 @@ class EventType extends AbstractType
                     $root = $r->find(1);
                     return $r->getLeafsQueryBuilder($root);
                 },
+                'attr' => ['disabled' => 'disabled']
             ])
             ->add('comment', null, [
                 'label'      => 'Комментарий',

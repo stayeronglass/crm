@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class AjaxSlotController extends AbstractController
 {
     #[Route('/ajax/slot', name: 'app_ajax_slot')]
-    public function slots(Request $request, SlotRepository $repository): Response
+    public function ajaxSlots(Request $request, SlotRepository $repository): JsonResponse
     {
         $slots = $repository->getSlots($request->get('start'), $request->get('end'));
 
@@ -48,16 +48,40 @@ final class AjaxSlotController extends AbstractController
     }
 
     #[Route('/ajax/slot/add', name: 'app_ajax_slot_add')]
-    public function eventsAdd(Request $request, EntityManagerInterface $em): Response
+    public function add(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $slot = new Slot();
 
         $form = $this->createForm(SlotType::class, $slot);
         $form->handleRequest($request);
-
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($slot);
+            $current = $slot->getDateBegin();
+
+            $repeatData = $form->get('dayOfWeek')->getData();
+
+            while ($current <= $slot->getDateEnd()) {
+                $newSlot = clone $slot; //все поля кроме дат берутся из него а он берет из формы
+
+                $dayOfWeekNumericISO = $current->format('l');
+                if ($repeatData[$dayOfWeekNumericISO] ?? false) {
+
+                    $currentTimeBegin = $repeatData[$dayOfWeekNumericISO . 'TimeBegin'];
+                    $currentTimeEnd   = $repeatData[$dayOfWeekNumericISO . 'TimeEnd'];
+
+                    $newSlot->setDateBegin($current->setTime((int)$currentTimeBegin->format('H'), (int)$currentTimeBegin->format('i')));
+                    $newSlot->setDateEnd($current->setTime((int)$currentTimeEnd->format('H'), (int)$currentTimeEnd->format('i')));
+                } else {
+                    $newSlot->setDateBegin($current->setTime((int)$slot->getDateBegin()->format('H'), (int)$slot->getDateBegin()->format('i')));
+                    $newSlot->setDateEnd($current->setTime((int)$slot->getDateEnd()->format('H'), (int)$slot->getDateEnd()->format('i')));
+                }
+
+                $newSlot->setSlotDate((new \DateTime())->setTimestamp($current->getTimestamp()));
+
+                $em->persist($newSlot);
+
+                $current = $current->add(new \DateInterval('P1D'));
+            }
+
             $em->flush();
 
             return new JsonResponse([
@@ -99,7 +123,7 @@ final class AjaxSlotController extends AbstractController
     }
 
     #[Route('/ajax/slot/delete', name: 'app_ajax_slot_delete', methods: ['POST'])]
-    public function delete(Request $request, EntityManagerInterface $em): Response
+    public function delete(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $slot = $em->getRepository(Slot::class)->find($request->request->get('id'));
         $event = $em->getRepository(Event::class)->findOneBy(['slot' => $slot->getId()]);
@@ -120,7 +144,7 @@ final class AjaxSlotController extends AbstractController
     }
 
     #[Route('/ajax/slot/resize', name: 'app_ajax_slot_resize')]
-    public function resize(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    public function ajaxSlotResize(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
         $slot = $em->getRepository(Slot::class)->find($request->request->get('id'));
         if (!$slot) return new JsonResponse([

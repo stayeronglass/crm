@@ -26,6 +26,7 @@ class SlotType extends AbstractType
                 'required' => true,
                 'attr'     => [
                     'maxlength' => 255, // Sets HTML <input maxlength="255">
+                    'required' => 'required',
                 ],
             ])
             ->add('description', null, [
@@ -33,6 +34,7 @@ class SlotType extends AbstractType
                 'required' => true,
                 'attr'     => [
                     'maxlength' => 10000, // Sets HTML <input maxlength="255">
+                    'required' => 'required',
                 ],
             ])
             ->add('dayOfWeek', WeekAndTimeType::class, [
@@ -42,18 +44,29 @@ class SlotType extends AbstractType
                 'help'     => 'Если не выбрать то будет один раз',
             ])
             ->add('price', null, [
-                'required' => false,
+                'required' => true,
                 'label'    => 'Цена',
+                'attr'     => [
+                    'required' => 'required',
+                    'min' => '1',
+                    'max' => '10000000',
+                ],
             ])
             ->add('dateBegin', null, [
                 'widget'   => 'single_text',
                 'label'    => 'Начало',
                 'required' => true,
+                'attr'     => [
+                    'required' => 'required',
+                ],
             ])
             ->add('dateEnd', null, [
                 'widget'   => 'single_text',
                 'label'    => 'Окончание',
                 'required' => true,
+                'attr'     => [
+                    'required' => 'required',
+                ],
             ])
             ->add('resources', EntityType::class, [
                 'class'         => Resource::class,
@@ -65,6 +78,9 @@ class SlotType extends AbstractType
                     $root = $r->find(1);
                     return $r->getLeafsQueryBuilder($root);
                 },
+                'attr'     => [
+                    'required' => 'required',
+                ],
             ])
             ->add('services', EntityType::class, [
                 'class'        => Service::class,
@@ -72,6 +88,9 @@ class SlotType extends AbstractType
                 'multiple'     => true,
                 'label'        => 'Услуга',
                 'required'     => true,
+                'attr'     => [
+                    'required' => 'required',
+                ],
             ])
             ->add('color', ColorType::class, [
                 'label' => 'Цвет',
