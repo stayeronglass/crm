@@ -1,8 +1,67 @@
+
 <div class="modal-header position-relative pb-0">
     <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close" onclick="dialog.close()"></button>
 </div>
-<h1 id="form_h1">Редактировать Слот</h1>
+
+<h1 id="form_h1">Редактировать слот</h1>
 {{ form_start(form) }}
+<div class="table-responsive">
+    <table class="table" style="width: 50%">
+        <thead>
+        <tr>
+            <th scope="col">
+                <input type="checkbox" id="form_select_all_checkbox" name="form_select_all_checkbox" class="form-check-input" onclick="checkAllExceptSelf(this)">&nbsp;
+                <label for="form_select_all_checkbox" style=" -webkit-user-select: none; -ms-user-select: none; user-select: none;">выбрать все</label>
+            </th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">Начало</th>
+            <th scope="col">Конец</th>
+        </tr>
+        </thead>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Monday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Monday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.MondayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.MondayTimeEnd) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Tuesday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Tuesday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.TuesdayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.TuesdayTimeEnd) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Wednesday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Wednesday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.WednesdayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.WednesdayTimeEnd) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Thursday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Thursday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.ThursdayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.ThursdayTimeEnd) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Friday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Friday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.FridayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.FridayTimeEnd) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Saturday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Saturday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.SaturdayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.SaturdayTimeEnd) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.dayOfWeek.Sunday) }}</td>
+            <td>{{ form_widget(form.dayOfWeek.Sunday) }}</td>
+            <td>{{ form_row(form.dayOfWeek.SundayTimeBegin) }}</td>
+            <td>{{ form_row(form.dayOfWeek.SundayTimeEnd) }}</td>
+        </tr>
+    </table>
+</div>
 <div class="row">
     <div class="col">
         {{ form_row(form.dateBegin) }}
@@ -11,6 +70,34 @@
         {{ form_row(form.dateEnd) }}
     </div>
 </div>
+<div class="row">
+    {{ form_row(form.title) }}
+</div>
+<div class="row">
+    {{ form_row(form.description) }}
+</div>
+<div class="row">
+    {{ form_row(form.price) }}
+</div>
+<div class="row">
+    <div class="col">
+        {{ form_row(form.resources) }}
+    </div>
+    <div class="col">
+        {{ form_row(form.services) }}
+    </div>
+</div>
+<div class="row">
+    {{ form_row(form.color) }}
+</div>
 
+<div class="row">
+    <div class="col">
+        {{ form_row(form.cancel) }}
+    </div>
+    <div class="col">
+        {{ form_row(form.submit) }}
+    </div>
+</div>
 {{ form_rest(form) }}
-{{ form_end(form) }}
+    {{ form_end(form) }}
